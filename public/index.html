@@ -7,356 +7,78 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary-color: #007BFF;
-            --secondary-color: #00D4FF;
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        body {
-            background: var(--bg-gradient);
-            background-attachment: fixed;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            overflow: hidden;
-        }
-
-        /* Overlay Background khas Pariwisata & AI */
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1920&q=80'); /* Foto Bali */
-            background-size: cover;
-            background-position: center;
-            opacity: 0.15;
-            z-index: -1;
-        }
-
-        .main-container {
-            width: 100%;
-            max-width: 900px;
-            height: 90vh;
-            display: flex;
-            flex-direction: column;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            position: relative;
-        }
-
-        /* Header */
-        header {
-            padding: 20px 30px;
-            border-bottom: 1px solid var(--glass-border);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        header .logo-circle {
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            border-radius: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-        }
-
-        header h1 {
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-
-        header p {
-            font-size: 12px;
-            opacity: 0.6;
-        }
-
-        /* Chat Area */
-        #chat-window {
-            flex: 1;
-            overflow-y: auto;
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--glass-border) transparent;
-        }
-
-        /* Tampilan Awal Ala Gemini */
-        .welcome-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            text-align: center;
-            animation: fadeIn 0.8s ease-out;
-        }
-
-        .welcome-screen h2 {
-            font-size: 32px;
-            margin-bottom: 10px;
-            background: linear-gradient(to right, #fff, #94a3b8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .suggestion-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
-            width: 100%;
-            max-width: 700px;
-            margin-top: 30px;
-        }
-
-        .suggestion-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--glass-border);
-            padding: 15px;
-            border-radius: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: left;
-            font-size: 14px;
-            color: #cbd5e1;
-        }
-
-        .suggestion-card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--secondary-color);
-            transform: translateY(-2px);
-        }
-
-        /* Bubble Chat Modern */
-        .message {
-            display: flex;
-            gap: 12px;
-            max-width: 80%;
-            animation: slideUp 0.3s ease-out;
-        }
-
-        .bot-message { align-self: flex-start; }
-        .user-message { 
-            align-self: flex-end; 
-            flex-direction: row-reverse;
-        }
-
-        .avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-shrink: 0;
-        }
-
-        .bot-avatar { 
-            background: var(--primary-color);
-            border: 2px solid rgba(255,255,255,0.2);
-        }
-        
+        :root { --primary: #007BFF; --glass: rgba(255, 255, 255, 0.05); --border: rgba(255, 255, 255, 0.1); }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: #0f172a; height: 100vh; display: flex; justify-content: center; align-items: center; color: white; overflow: hidden; }
+        body::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1920&q=80'); background-size: cover; opacity: 0.1; z-index: -1; }
+        .main-container { width: 100%; max-width: 900px; height: 90vh; background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 24px; display: flex; flex-direction: column; }
+        header { padding: 20px 30px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px; }
+        .logo-circle { width: 45px; height: 45px; background: linear-gradient(45deg, var(--primary), #00D4FF); border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 24px; }
+        #chat-window { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 20px; }
+        .welcome-screen { text-align: center; margin-top: 50px; }
+        .suggestion-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; width: 100%; max-width: 750px; margin: 30px auto; }
+        .suggestion-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 18px; border-radius: 16px; cursor: pointer; transition: 0.3s; text-align: left; font-size: 13px; color: #cbd5e1; font-weight: 500; }
+        .suggestion-card:hover { border-color: #00D4FF; transform: translateY(-2px); background: rgba(255,255,255,0.08); }
+        .message { display: flex; gap: 12px; max-width: 85%; animation: slideUp 0.3s ease-out; margin-bottom: 10px; }
+        .user-message { align-self: flex-end; flex-direction: row-reverse; }
+        .avatar { width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; }
+        .bot-avatar { background: var(--primary); border: 2px solid rgba(255,255,255,0.2); }
         .user-avatar { background: #64748b; }
-
-        .bubble {
-            padding: 12px 18px;
-            border-radius: 18px;
-            font-size: 15px;
-            line-height: 1.5;
-        }
-
-        .bot-bubble {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid var(--glass-border);
-            border-top-left-radius: 4px;
-        }
-
-        .user-bubble {
-            background: var(--primary-color);
-            color: white;
-            border-top-right-radius: 4px;
-        }
-
-        /* Input Area */
-        .input-area {
-            padding: 20px 30px 30px;
-        }
-
-        .input-wrapper {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            border-radius: 100px;
-            display: flex;
-            align-items: center;
-            padding: 6px 6px 6px 20px;
-            transition: all 0.3s ease;
-        }
-
-        .input-wrapper:focus-within {
-            border-color: var(--secondary-color);
-            background: rgba(255, 255, 255, 0.08);
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
-        }
-
-        input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            outline: none;
-            font-size: 15px;
-            padding: 10px 0;
-        }
-
-        button {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            border: none;
-            background: var(--primary-color);
-            color: white;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        button:hover {
-            transform: scale(1.05);
-            background: var(--secondary-color);
-        }
-
-        /* Animasi */
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { 
-            from { opacity: 0; transform: translateY(10px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
-
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+        .bubble { padding: 12px 18px; border-radius: 18px; font-size: 14.5px; line-height: 1.6; }
+        .bot-bubble { background: rgba(255,255,255,0.08); border: 1px solid var(--border); border-top-left-radius: 4px; }
+        .user-bubble { background: var(--primary); border-top-right-radius: 4px; }
+        .input-area { padding: 20px 30px 30px; }
+        .input-wrapper { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 100px; display: flex; padding: 6px 6px 6px 20px; }
+        input { flex: 1; background: transparent; border: none; color: white; outline: none; padding: 10px 0; }
+        button { width: 45px; height: 45px; border-radius: 50%; border: none; background: var(--primary); color: white; cursor: pointer; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
-
     <div class="main-container">
         <header>
             <div class="logo-circle"><i class="fas fa-robot"></i></div>
             <div>
-                <h1>Nusa AI</h1>
-                <p><i class="fas fa-circle" style="color: #10b981; font-size: 8px;"></i> Smart Travel Assistant • Trio Ngalam</p>
+                <h1 style="font-size: 18px;">Nusa AI</h1>
+                <p style="font-size: 11px; opacity: 0.6;"><i class="fas fa-circle" style="color: #10b981; font-size: 7px;"></i> Smart Travel Assistant • Trio Ngalam</p>
             </div>
         </header>
-
         <div id="chat-window">
             <div id="welcome-screen" class="welcome-screen">
-                <h2>Halo, saya NusaBot</h2>
-                <p>Mau eksplor destinasi autentik mana kita hari ini?</p>
-                
+                <h2 style="font-size: 28px; margin-bottom: 8px;">Halo, saya NusaBot</h2>
+                <p style="opacity: 0.7;">Mau eksplor destinasi autentik mana kita hari ini?</p>
                 <div class="suggestion-grid">
-                    <div class="suggestion-card" onclick="sendSuggested('Siapakah Anda?')">
-                        <i class="fas fa-id-badge" style="margin-bottom: 8px; color: var(--secondary-color);"></i><br>
-                        Siapakah Anda?
-                    </div>
-                    <div class="suggestion-card" onclick="sendSuggested('Buatkan Itinerary 3 Hari di Kota Malang')">
-                        <i class="fas fa-map-location-dot" style="margin-bottom: 8px; color: var(--secondary-color);"></i><br>
-                        Buatkan Itinerary 3 Hari di Kota Malang
-                    </div>
-                    <div class="suggestion-card" onclick="sendSuggested('Rekomendasi tempat wisata di Bali untuk Sunrise')">
-                        <i class="fas fa-sun" style="margin-bottom: 8px; color: var(--secondary-color);"></i><br>
-                        Wisata Bali untuk Sunrise
-                    </div>
-                    <div class="suggestion-card" onclick="sendSuggested('Apa itu TravelMate?')">
-                        <i class="fas fa-users-gear" style="margin-bottom: 8px; color: var(--secondary-color);"></i><br>
-                        Tentang Layanan TravelMate
-                    </div>
+                    <div class="suggestion-card" onclick="sendSuggested('Siapakah Anda?')"><i class="fas fa-id-badge" style="color: #00D4FF; margin-bottom: 5px;"></i><br>Siapakah Anda?</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Buatkan itinerary 3 hari di Malang')"><i class="fas fa-map-location-dot" style="color: #00D4FF; margin-bottom: 5px;"></i><br>Itinerary 3 hari di Malang</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Rekomendasi wisata Bali untuk sunrise')"><i class="fas fa-sun" style="color: #00D4FF; margin-bottom: 5px;"></i><br>Wisata Bali untuk sunrise</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Apa itu layanan TravelMate?')"><i class="fas fa-users-gear" style="color: #00D4FF; margin-bottom: 5px;"></i><br>Apa itu layanan TravelMate?</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Apa hubungan Nusa AI dengan SmartNusa?')"><i class="fas fa-circle-nodes" style="color: #00D4FF; margin-bottom: 5px;"></i><br>Nusa AI & SmartNusa</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Cari hidden gems di Indonesia')"><i class="fas fa-gem" style="color: #00D4FF; margin-bottom: 5px;"></i><br>Cari hidden gems Indonesia</div>
                 </div>
             </div>
         </div>
-
-        <div class="input-area">
-            <div class="input-wrapper">
-                <input type="text" id="user-input" placeholder="Tanyakan tentang rute, hidden gems, atau itinerary..." onkeypress="handleKeyPress(event)">
-                <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
-            </div>
-        </div>
+        <div class="input-area"><div class="input-wrapper"><input type="text" id="user-input" placeholder="Tanyakan sesuatu..." onkeypress="if(event.key==='Enter')sendMessage()"><button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button></div></div>
     </div>
-
     <script>
-        const chatWindow = document.getElementById('chat-window');
-        const welcomeScreen = document.getElementById('welcome-screen');
-
-        function handleKeyPress(e) {
-            if (e.key === 'Enter') sendMessage();
-        }
-
-        function sendSuggested(text) {
-            document.getElementById('user-input').value = text;
-            sendMessage();
-        }
-
         async function sendMessage() {
             const input = document.getElementById('user-input');
             const message = input.value.trim();
             if (!message) return;
-
-            // Sembunyikan welcome screen pada chat pertama
-            if (welcomeScreen) welcomeScreen.style.display = 'none';
-
-            // Tampilkan pesan user
+            document.getElementById('welcome-screen').style.display = 'none';
             appendMessage('user', message);
             input.value = '';
-
             try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message })
-                });
-                const data = await response.json();
+                const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message }) });
+                const data = await res.json();
                 appendMessage('bot', data.reply);
-            } catch (err) {
-                appendMessage('bot', 'Aduh, sepertinya ada gangguan sinyal di Nusa AI.');
-            }
+            } catch { appendMessage('bot', 'Maaf, server NusaBot sedang sibuk.'); }
         }
-
-        function appendMessage(sender, text) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `message ${sender}-message`;
-
-            const avatar = document.createElement('div');
-            avatar.className = `avatar ${sender}-avatar`;
-            avatar.innerHTML = sender === 'bot' ? '<i class="fas fa-robot"></i>' : '<i class="fas fa-user"></i>';
-
-            const bubble = document.createElement('div');
-            bubble.className = `bubble ${sender}-bubble`;
-            bubble.innerText = text;
-
-            msgDiv.appendChild(avatar);
-            msgDiv.appendChild(bubble);
-            chatWindow.appendChild(msgDiv);
-
-            // Auto scroll ke bawah
-            chatWindow.scrollTop = chatWindow.scrollHeight;
+        function sendSuggested(t) { document.getElementById('user-input').value = t; sendMessage(); }
+        function appendMessage(s, t) {
+            const d = document.createElement('div'); d.className = `message ${s}-message`;
+            d.innerHTML = `<div class="avatar ${s}-avatar"><i class="fas fa-${s==='bot'?'robot':'user'}"></i></div><div class="bubble ${s}-bubble">${t}</div>`;
+            document.getElementById('chat-window').appendChild(d);
+            document.getElementById('chat-window').scrollTop = document.getElementById('chat-window').scrollHeight;
         }
     </script>
 </body>
