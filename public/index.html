@@ -15,10 +15,10 @@
         header { padding: 20px 30px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px; }
         .logo-circle { width: 45px; height: 45px; background: linear-gradient(45deg, var(--primary), #00D4FF); border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 24px; }
         #chat-window { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 20px; }
-        .welcome-screen { text-align: center; margin-top: 50px; }
-        .suggestion-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; width: 100%; max-width: 750px; margin: 30px auto; }
-        .suggestion-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 18px; border-radius: 16px; cursor: pointer; transition: 0.3s; text-align: left; font-size: 13px; color: #cbd5e1; font-weight: 500; }
-        .suggestion-card:hover { border-color: #00D4FF; transform: translateY(-2px); background: rgba(255,255,255,0.08); }
+        .welcome-screen { text-align: center; margin-top: 30px; }
+        .suggestion-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; width: 100%; max-width: 800px; margin: 25px auto; }
+        .suggestion-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 15px; border-radius: 16px; cursor: pointer; transition: 0.3s; text-align: left; font-size: 13px; color: #cbd5e1; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+        .suggestion-card:hover { border-color: #00D4FF; background: rgba(255,255,255,0.08); transform: translateY(-2px); }
         .message { display: flex; gap: 12px; max-width: 85%; animation: slideUp 0.3s ease-out; margin-bottom: 10px; }
         .user-message { align-self: flex-end; flex-direction: row-reverse; }
         .avatar { width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; }
@@ -30,7 +30,8 @@
         .input-area { padding: 20px 30px 30px; }
         .input-wrapper { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 100px; display: flex; padding: 6px 6px 6px 20px; }
         input { flex: 1; background: transparent; border: none; color: white; outline: none; padding: 10px 0; }
-        button { width: 45px; height: 45px; border-radius: 50%; border: none; background: var(--primary); color: white; cursor: pointer; }
+        button { width: 45px; height: 45px; border-radius: 50%; border: none; background: var(--primary); color: white; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #00D4FF; transform: scale(1.05); }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -45,19 +46,19 @@
         </header>
         <div id="chat-window">
             <div id="welcome-screen" class="welcome-screen">
-                <h2 style="font-size: 28px; margin-bottom: 8px;">Halo, saya NusaBot</h2>
+                <h2 style="font-size: 32px; margin-bottom: 8px;">Halo, saya NusaBot</h2>
                 <p style="opacity: 0.7;">Mau eksplor destinasi autentik mana kita hari ini?</p>
                 <div class="suggestion-grid">
-                    <div class="suggestion-card" onclick="sendSuggested('Siapakah Anda?')"><i class="fas fa-id-badge" style="color: #00D4FF; margin-bottom: 5px;"></i><br>Siapakah Anda?</div>
-                    <div class="suggestion-card" onclick="sendSuggested('Buatkan itinerary 3 hari di Malang')"><i class="fas fa-map-location-dot" style="color: #00D4FF; margin-bottom: 5px;"></i><br>Itinerary 3 hari di Malang</div>
-                    <div class="suggestion-card" onclick="sendSuggested('Rekomendasi wisata Bali untuk sunrise')"><i class="fas fa-sun" style="color: #00D4FF; margin-bottom: 5px;"></i><br>Wisata Bali untuk sunrise</div>
-                    <div class="suggestion-card" onclick="sendSuggested('Apa itu layanan TravelMate?')"><i class="fas fa-users-gear" style="color: #00D4FF; margin-bottom: 5px;"></i><br>Apa itu layanan TravelMate?</div>
-                    <div class="suggestion-card" onclick="sendSuggested('Apa hubungan Nusa AI dengan SmartNusa?')"><i class="fas fa-circle-nodes" style="color: #00D4FF; margin-bottom: 5px;"></i><br>Nusa AI & SmartNusa</div>
-                    <div class="suggestion-card" onclick="sendSuggested('Cari hidden gems di Indonesia')"><i class="fas fa-gem" style="color: #00D4FF; margin-bottom: 5px;"></i><br>Cari hidden gems Indonesia</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Siapakah Anda?')"><i class="fas fa-id-badge" style="color:#00D4FF"></i> Siapakah Anda?</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Buatkan itinerary 3 hari di Kota Malang')"><i class="fas fa-map-location-dot" style="color:#00D4FF"></i> Itinerary 3 hari di Malang</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Rekomendasi wisata Bali untuk sunrise')"><i class="fas fa-sun" style="color:#00D4FF"></i> Wisata Bali untuk sunrise</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Apa itu layanan TravelMate?')"><i class="fas fa-users-gear" style="color:#00D4FF"></i> Layanan TravelMate</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Apa hubungan Nusa AI dengan SmartNusa?')"><i class="fas fa-circle-nodes" style="color:#00D4FF"></i> Nusa AI & SmartNusa</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Cari hidden gems di Indonesia')"><i class="fas fa-gem" style="color:#00D4FF"></i> Hidden gems Indonesia</div>
                 </div>
             </div>
         </div>
-        <div class="input-area"><div class="input-wrapper"><input type="text" id="user-input" placeholder="Tanyakan sesuatu..." onkeypress="if(event.key==='Enter')sendMessage()"><button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button></div></div>
+        <div class="input-area"><div class="input-wrapper"><input type="text" id="user-input" placeholder="Tanyakan rute atau destinasi..." onkeypress="if(event.key==='Enter')sendMessage()"><button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button></div></div>
     </div>
     <script>
         async function sendMessage() {
@@ -70,8 +71,10 @@
             try {
                 const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message }) });
                 const data = await res.json();
-                appendMessage('bot', data.reply);
-            } catch { appendMessage('bot', 'Maaf, server NusaBot sedang sibuk.'); }
+                // FIX: Menangani data.reply yang mungkin undefined dengan menampilkan data.error
+                const reply = data.reply || data.error || "Maaf, terjadi gangguan teknis.";
+                appendMessage('bot', reply);
+            } catch (e) { appendMessage('bot', 'Maaf, server sedang sibuk.'); }
         }
         function sendSuggested(t) { document.getElementById('user-input').value = t; sendMessage(); }
         function appendMessage(s, t) {
