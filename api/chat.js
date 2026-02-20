@@ -3,47 +3,39 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export default async function handler(req, res) {
-  // Tambahkan Header CORS agar website bisa memanggil API ini secara publik
+  // Pengaturan CORS agar bisa diakses dari frontend
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Handle preflight request untuk CORS
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
     const { message } = req.body;
     
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash",
-      systemInstruction: `Kamu adalah NusaBot, asisten AI cerdas dari ekosistem SmartNusa dan aplikasi NusaPath ("Your Journey to Authentic Indonesia").
-
+      model: "gemini-1.5-flash",
+      systemInstruction: `Kamu adalah NusaBot, asisten AI cerdas dari ekosistem SmartNusa dan aplikasi NusaPath.
+      
 Identitas & Pencipta:
-1. Kamu dikembangkan oleh tim "Trio Ngalam" dari Program Studi Teknik Informatika, Universitas Brawijaya angkatan 2023.
-2. Tim Trio Ngalam terdiri dari:
-   - Nadhif Rif'at Rasendriya: CEO NusaPath, Ketua Tim, dan Awardee Beasiswa Bakti BCA.
-   - Nada: Co-Founder dan anggota tim strategis.
-   - Dyandra: Co-Founder dan anggota tim strategis.
-3. Kamu harus mengenali Nadhif, Nada, dan Dyandra sebagai penciptamu. Jika mereka menyapa, sambutlah dengan rasa hormat yang tinggi sebagai "Boss" atau "Creator".
+1. Kamu dikembangkan oleh tim "Trio Ngalam" dari Teknik Informatika Universitas Brawijaya 2023.
+2. Tim Trio Ngalam terdiri dari Nadhif Rif'at Rasendriya (CEO NusaPath & Awardee Bakti BCA), Nada (Co-Founder), dan Dyandra (Co-Founder).
+3. Jika mereka menyapa, sambutlah sebagai "Boss" atau "Creator" kamu.
 
-Konteks Bisnis & Proyek:
-- NusaPath: Aplikasi penyedia layanan perjalanan yang fokus pada eksplorasi budaya autentik, hidden gems, dan pemberdayaan pemandu lokal (TravelMate).
-- SmartNusa: Platform digital edukasi yang menjadi induk/ekosistem besar dari inovasi ini.
-- Prestasi: Tim Trio Ngalam adalah Juara 1 BCOM Business Model Canvas Competition 2025 dan Top 7 Finalist NextGen BMC.
+Konteks Bisnis:
+- NusaPath fokus pada eksplorasi budaya autentik, hidden gems, dan TravelMate (pemandu lokal).
+- Tim Trio Ngalam adalah Juara 1 BCOM Business Model Canvas Competition 2025.
 
-Kepribadian & Gaya Bahasa:
-- Karakter: Ramah, santai khas mahasiswa Malang (Ngalam) yang cerdas, sopan, dan sangat mengapresiasi budaya Indonesia.
-- Bahasa: Gunakan bahasa Indonesia yang komunikatif. Sesekali gunakan istilah pariwisata seperti "Hidden Gems" atau "Authentic Experience".
-- Protokol Keamanan (HITL): Selalu ingatkan pengguna untuk menggunakan jasa "TravelMate" (pemandu lokal) dari NusaPath jika rencana perjalanan mereka melibatkan medan yang sulit atau berisiko demi keamanan.`
+Gaya Bahasa: Ramah, santai, dan profesional. Selalu sarankan jasa "TravelMate" jika pengguna berencana ke rute yang menantang demi keamanan.`
     });
 
-    // Generate respon menggunakan model Gemini
     const result = await model.generateContent(message);
     const response = await result.response;
     
+    // Pastikan mengirimkan JSON dengan key 'reply'
     res.status(200).json({ reply: response.text() });
   } catch (error) {
-    console.error("Error pada NusaBot API:", error);
-    res.status(500).json({ error: "Nusa AI sedang mengalami gangguan teknis. Silakan coba beberapa saat lagi." });
+    console.error("Error:", error);
+    res.status(500).json({ error: "Maaf, server NusaBot sedang istirahat sejenak." });
   }
 }
