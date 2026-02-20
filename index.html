@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nusa AI - Smart Itinerary</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .chat-container { width: 400px; height: 600px; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden; }
+        .chat-header { background: #007BFF; color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 1.2rem; }
+        .chat-box { flex: 1; padding: 15px; overflow-y: auto; background: #fafafa; display: flex; flex-direction: column; gap: 10px; }
+        .message { max-width: 80%; padding: 10px 15px; border-radius: 15px; font-size: 0.95rem; line-height: 1.4; }
+        .user-msg { background: #007BFF; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .bot-msg { background: #e9ecef; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .input-area { display: flex; padding: 10px; background: white; border-top: 1px solid #ddd; }
+        .input-area input { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 20px; outline: none; }
+        .input-area button { background: #007BFF; color: white; border: none; padding: 10px 15px; margin-left: 10px; border-radius: 50%; cursor: pointer; font-weight: bold; }
+        .input-area button:hover { background: #0056b3; }
+        /* Animasi loading sederhana */
+        .loading { font-style: italic; color: #888; font-size: 0.85rem; align-self: flex-start; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="chat-header">
+        Nusa AI - Chatbot
+    </div>
+    
+    <div class="chat-box" id="chatBox">
+        <div class="message bot-msg">Halo! Saya Chatbot dari Nusa AI. Ada yang bisa saya bantu untuk rencana liburanmu hari ini? ✨</div>
+    </div>
+    <div class="loading" id="loadingText">NusaBot sedang mengetik...</div>
+
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="Ketik pesan di sini..." onkeypress="handleEnter(event)">
+        <button onclick="sendMessage()">➤</button>
+    </div>
+</div>
+
+<script>
+    const chatBox = document.getElementById('chatBox');
+    const userInput = document.getElementById('userInput');
+    const loadingText = document.getElementById('loadingText');
+
+    // Fungsi saat tombol Enter ditekan
+    function handleEnter(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    }
+
+    async function sendMessage() {
+        const text = userInput.value.trim();
+        if (!text) return;
+
+        // 1. Tampilkan pesan User di layar
+        appendMessage(text, 'user-msg');
+        userInput.value = ''; // Kosongkan kolom ketik
+
+        // Tampilkan indikator loading
+        loadingText.style.display = 'block';
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        try {
+            // 2. Kirim pesan ke Backend (Server index.js kita)
+            const response = await fetch('http://localhost:3000/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text })
+            });
+
+            const data = await response.json();
+
+            // Sembunyikan loading
+            loadingText.style.display = 'none';
+
+            if (data.reply) {
+                // 3. Tampilkan balasan bot di layar
+                // Mengubah newline \n menjadi <br> agar rapi di HTML
+                const formattedReply = data.reply.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+                appendMessage(formattedReply, 'bot-msg');
+            } else {
+                appendMessage("Maaf, terjadi kesalahan pada server NusaBot.", 'bot-msg');
+            }
+
+        } catch (error) {
+            loadingText.style.display = 'none';
+            appendMessage("Waduh, gagal terhubung ke server. Pastikan terminal index.js masih menyala!", 'bot-msg');
+            console.error(error);
+        }
+    }
+
+    // Fungsi untuk menambahkan gelembung chat ke layar
+    function appendMessage(text, className) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message ${className}`;
+        msgDiv.innerHTML = text; // Pakai innerHTML agar <br> dan format tebal berfungsi
+        chatBox.appendChild(msgDiv);
+        
+        // Auto-scroll ke bawah
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+</script>
+
+</body>
+</html>
