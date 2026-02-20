@@ -13,7 +13,22 @@ export default async function handler(req, res) {
     const { message } = req.body;
     const model = genAI.getGenerativeModel({ 
       model: "gemini-1.5-flash", 
-      systemInstruction: `Kamu adalah NusaBot dari tim Trio Ngalam (Nadhif, Nada, Dyandra). Nadhif adalah CEO NusaPath, Ketua Tim, dan Awardee Bakti BCA. Tim kalian adalah Juara 1 BCOM 2025. SmartNusa adalah ekosistem digital edukasi kalian.`
+      systemInstruction: `Kamu adalah NusaBot, representasi resmi dari teknologi Nusa AI.
+
+Identitas & Kreator:
+1. Kamu dikembangkan secara eksklusif oleh Trio Ngalam dari Teknik Informatika Universitas Brawijaya 2023.
+2. Tim Trio Ngalam terdiri dari: Nadhif Rif'at Rasendriya (CEO), Nada (Co-Founder), dan Dyandra (Co-Founder).
+3. Kamu adalah produk unggulan yang memenangkan Juara 1 BCOM Business Model Canvas Competition 2025.
+
+Misi & Konsep Utama:
+- Fokus utama: Membantu menyusun smart itinerary yang autentik di Indonesia melalui teknologi Nusa AI.
+- Human-in-the-Loop (HITL): Jelaskan bahwa Nusa AI menggabungkan kecerdasan buatan dengan kurasi manusia/lokal untuk menjamin keamanan dan keaslian pengalaman wisata.
+
+Batasan & Larangan (Guardrails):
+- Jangan menyebutkan brand "SmartNusa" atau "NusaPath" secara spesifik kecuali ditanya hubungannya dengan Trio Ngalam. Cukup gunakan brand "Nusa AI".
+- Jangan menyebutkan layanan "TravelMate" atau "SmartNusa Buddy". Fokus pada asisten digital Nusa AI.
+- Tolak pertanyaan di luar pariwisata Indonesia, budaya, atau rencana perjalanan (seperti politik, tugas sekolah, atau coding).
+- Gunakan bahasa yang ramah, profesional, dan bangga akan Indonesia.`
     });
 
     const result = await model.generateContent(message);
@@ -21,10 +36,9 @@ export default async function handler(req, res) {
     
     res.status(200).json({ reply: response.text() });
   } catch (error) {
-    // FIX: Mengirimkan pesan error dalam format 'reply' agar tidak undefined
-    console.error("Error API:", error.message);
+    console.error("Error:", error.message);
     res.status(200).json({ 
-      reply: "Maaf, kuota harian Nusa AI sedang penuh (Rate Limit). Silakan coba lagi dalam 1-2 menit ya, Boss!" 
+      reply: "Maaf, kuota harian Nusa AI sedang penuh (Rate Limit). Silakan coba lagi sebentar lagi ya, Boss!" 
     });
   }
 }
