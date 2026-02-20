@@ -9,17 +9,17 @@
     <style>
         :root { --primary: #007BFF; --glass: rgba(255, 255, 255, 0.05); --border: rgba(255, 255, 255, 0.1); }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: #0f172a; height: 100vh; display: flex; justify-content: center; align-items: center; color: white; overflow: hidden; }
+        body { background: #0f172a; height: 100vh; display: flex; justify-content: center; align-items: center; color: white; overflow: hidden; position: relative; }
         body::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1920&q=80'); background-size: cover; opacity: 0.1; z-index: -1; }
-        .main-container { width: 100%; max-width: 900px; height: 90vh; background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 24px; display: flex; flex-direction: column; }
+        .main-container { width: 95%; max-width: 900px; height: 90vh; background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 24px; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
         header { padding: 20px 30px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px; }
         .logo-circle { width: 45px; height: 45px; background: linear-gradient(45deg, var(--primary), #00D4FF); border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 24px; }
         #chat-window { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 20px; }
-        .welcome-screen { text-align: center; margin-top: 30px; }
-        .suggestion-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; width: 100%; max-width: 800px; margin: 25px auto; }
-        .suggestion-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 15px; border-radius: 16px; cursor: pointer; transition: 0.3s; text-align: left; font-size: 13px; color: #cbd5e1; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+        .welcome-screen { text-align: center; margin: auto; animation: fadeIn 0.8s ease; }
+        .suggestion-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; width: 100%; max-width: 800px; margin: 30px auto; }
+        .suggestion-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 18px; border-radius: 16px; cursor: pointer; transition: 0.3s; text-align: left; font-size: 13px; color: #cbd5e1; font-weight: 500; display: flex; align-items: center; gap: 12px; }
         .suggestion-card:hover { border-color: #00D4FF; background: rgba(255,255,255,0.08); transform: translateY(-2px); }
-        .message { display: flex; gap: 12px; max-width: 85%; animation: slideUp 0.3s ease-out; margin-bottom: 10px; }
+        .message { display: flex; gap: 12px; max-width: 85%; animation: slideUp 0.3s ease-out; }
         .user-message { align-self: flex-end; flex-direction: row-reverse; }
         .avatar { width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; }
         .bot-avatar { background: var(--primary); border: 2px solid rgba(255,255,255,0.2); }
@@ -29,9 +29,10 @@
         .user-bubble { background: var(--primary); border-top-right-radius: 4px; }
         .input-area { padding: 20px 30px 30px; }
         .input-wrapper { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 100px; display: flex; padding: 6px 6px 6px 20px; }
-        input { flex: 1; background: transparent; border: none; color: white; outline: none; padding: 10px 0; }
+        input { flex: 1; background: transparent; border: none; color: white; outline: none; padding: 10px 0; font-size: 15px; }
         button { width: 45px; height: 45px; border-radius: 50%; border: none; background: var(--primary); color: white; cursor: pointer; transition: 0.3s; }
         button:hover { background: #00D4FF; transform: scale(1.05); }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -44,6 +45,7 @@
                 <p style="font-size: 11px; opacity: 0.6;"><i class="fas fa-circle" style="color: #10b981; font-size: 7px;"></i> Smart Travel Assistant • Trio Ngalam</p>
             </div>
         </header>
+
         <div id="chat-window">
             <div id="welcome-screen" class="welcome-screen">
                 <h2 style="font-size: 32px; margin-bottom: 8px;">Halo, saya NusaBot</h2>
@@ -52,36 +54,53 @@
                     <div class="suggestion-card" onclick="sendSuggested('Siapakah Anda?')"><i class="fas fa-id-badge" style="color:#00D4FF"></i> Siapakah Anda?</div>
                     <div class="suggestion-card" onclick="sendSuggested('Buatkan itinerary 3 hari di Kota Malang')"><i class="fas fa-map-location-dot" style="color:#00D4FF"></i> Itinerary 3 hari di Malang</div>
                     <div class="suggestion-card" onclick="sendSuggested('Rekomendasi wisata Bali untuk sunrise')"><i class="fas fa-sun" style="color:#00D4FF"></i> Wisata Bali untuk sunrise</div>
-                    <div class="suggestion-card" onclick="sendSuggested('Apa itu layanan TravelMate?')"><i class="fas fa-users-gear" style="color:#00D4FF"></i> Layanan TravelMate</div>
-                    <div class="suggestion-card" onclick="sendSuggested('Apa hubungan Nusa AI dengan SmartNusa?')"><i class="fas fa-circle-nodes" style="color:#00D4FF"></i> Nusa AI & SmartNusa</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Apa itu Nusa Bot & Nusa AI?')"><i class="fas fa-robot" style="color:#00D4FF"></i> Nusa Bot & Nusa AI</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Jelaskan konsep Human-in-the-loop di Nusa AI')"><i class="fas fa-hands-holding-circle" style="color:#00D4FF"></i> Konsep Human-in-the-Loop</div>
                     <div class="suggestion-card" onclick="sendSuggested('Cari hidden gems di Indonesia')"><i class="fas fa-gem" style="color:#00D4FF"></i> Hidden gems Indonesia</div>
                 </div>
             </div>
         </div>
-        <div class="input-area"><div class="input-wrapper"><input type="text" id="user-input" placeholder="Tanyakan rute atau destinasi..." onkeypress="if(event.key==='Enter')sendMessage()"><button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button></div></div>
+
+        <div class="input-area">
+            <div class="input-wrapper">
+                <input type="text" id="user-input" placeholder="Tanyakan rute atau destinasi..." onkeypress="if(event.key==='Enter')sendMessage()">
+                <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
     </div>
+
     <script>
+        const chatWindow = document.getElementById('chat-window');
+        const welcomeScreen = document.getElementById('welcome-screen');
+
+        function sendSuggested(t) { document.getElementById('user-input').value = t; sendMessage(); }
+
         async function sendMessage() {
             const input = document.getElementById('user-input');
             const message = input.value.trim();
             if (!message) return;
-            document.getElementById('welcome-screen').style.display = 'none';
+            if (welcomeScreen) welcomeScreen.style.display = 'none';
             appendMessage('user', message);
             input.value = '';
+
             try {
-                const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message }) });
+                const res = await fetch('/api/chat', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ message }) 
+                });
                 const data = await res.json();
-                // FIX: Menangani data.reply yang mungkin undefined dengan menampilkan data.error
-                const reply = data.reply || data.error || "Maaf, terjadi gangguan teknis.";
-                appendMessage('bot', reply);
-            } catch (e) { appendMessage('bot', 'Maaf, server sedang sibuk.'); }
+                appendMessage('bot', data.reply || data.error);
+            } catch (e) { 
+                appendMessage('bot', 'Maaf, server sedang sibuk.'); 
+            }
         }
-        function sendSuggested(t) { document.getElementById('user-input').value = t; sendMessage(); }
+
         function appendMessage(s, t) {
             const d = document.createElement('div'); d.className = `message ${s}-message`;
             d.innerHTML = `<div class="avatar ${s}-avatar"><i class="fas fa-${s==='bot'?'robot':'user'}"></i></div><div class="bubble ${s}-bubble">${t}</div>`;
-            document.getElementById('chat-window').appendChild(d);
-            document.getElementById('chat-window').scrollTop = document.getElementById('chat-window').scrollHeight;
+            chatWindow.appendChild(d);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
         }
     </script>
 </body>
