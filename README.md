@@ -4,36 +4,27 @@
 
 ## 🌟 Fitur Utama
 
-* 
-**Smart Itinerary Planner**: Menyusun rencana perjalanan harian yang dipersonalisasi di berbagai destinasi Indonesia.
+* **Smart Itinerary Planner**: Menyusun rencana perjalanan harian yang dipersonalisasi di berbagai destinasi Indonesia.
 
-
-* 
-**Hidden Gems Discovery**: Memberikan rekomendasi destinasi unik yang jarang diketahui turis mancanegara namun memiliki nilai budaya tinggi.
-
+* **Hidden Gems Discovery**: Memberikan rekomendasi destinasi unik yang jarang diketahui turis mancanegara namun memiliki nilai budaya tinggi.
 
 * **Safety-First (HITL Simulation)**: Memiliki protokol keamanan di mana AI akan menyarankan pendampingan dari **TravelMate** (pemandu lokal) jika rute yang dipilih pengguna dianggap menantang atau berisiko tinggi.
-* 
-**Authentic Persona**: Menggunakan gaya bahasa yang ramah, santai, namun tetap sopan, mencerminkan keramahtamahan khas Indonesia.
+* **Authentic Persona**: Menggunakan gaya bahasa yang ramah, santai, namun tetap sopan, mencerminkan keramahtamahan khas Indonesia.
 
 
 
 ## 🛠️ Tech Stack
 
-* 
-**AI Model**: Google Gemini 2.5 Flash (via Google Generative AI API).
+* **AI Model**: Google Gemini 2.5 Flash (via Google Generative AI API).
 
 
-* 
-**Backend**: Node.js & Express (Deployed via Vercel Serverless Functions).
+* **Backend**: Node.js & Express (Deployed via Vercel Serverless Functions).
 
 
-* 
-**Frontend**: Vanilla HTML5, CSS3, dan JavaScript.
+* **Frontend**: Vanilla HTML5, CSS3, dan JavaScript.
 
 
-* 
-**Deployment**: Vercel.
+* **Deployment**: Vercel.
 
 
 
