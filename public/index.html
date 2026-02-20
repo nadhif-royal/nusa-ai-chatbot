@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nusa AI - Smart Travel Assistant</title>
+    
+    <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" rx="32" fill="%23007BFF"/><path fill="%23FFF" d="M64 20c-13.2 0-24 10.8-24 24v8H28c-4.4 0-8 3.6-8 8v48c0 4.4 3.6 8 8 8h72c4.4 0 8-3.6 8-8V60c0-4.4-3.6-8-8-8H88v-8c0-13.2-10.8-24-24-24zm0 16c4.4 0 8 3.6 8 8v8H56v-8c0-4.4 3.6-8 8-8zM44 68a8 8 0 1 1 16 0 8 8 0 1 1-16 0zm24 0a8 8 0 1 1 16 0 8 8 0 1 1-16 0z"/></svg>'>
+    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -90,7 +93,7 @@
                     body: JSON.stringify({ message }) 
                 });
                 const data = await res.json();
-                appendMessage('bot', data.reply || data.error);
+                appendMessage('bot', data.reply || "Maaf, terjadi gangguan teknis.");
             } catch (e) { 
                 appendMessage('bot', 'Maaf, server sedang sibuk.'); 
             }
