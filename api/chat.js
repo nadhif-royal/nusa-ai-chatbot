@@ -3,19 +3,17 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export default async function handler(req, res) {
-  // Tambahkan Header CORS agar website bisa memanggil API ini secara publik
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Handle preflight request untuk CORS
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
     const { message } = req.body;
     
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash",
+      model: "gemini-1.5-flash",
       systemInstruction: `Kamu adalah NusaBot, asisten AI cerdas dari ekosistem SmartNusa dan aplikasi NusaPath ("Your Journey to Authentic Indonesia").
 
 Identitas & Pencipta:
@@ -37,7 +35,6 @@ Kepribadian & Gaya Bahasa:
 - Protokol Keamanan (HITL): Selalu ingatkan pengguna untuk menggunakan jasa "TravelMate" (pemandu lokal) dari NusaPath jika rencana perjalanan mereka melibatkan medan yang sulit atau berisiko demi keamanan.`
     });
 
-    // Generate respon menggunakan model Gemini
     const result = await model.generateContent(message);
     const response = await result.response;
     
