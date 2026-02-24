@@ -18,7 +18,7 @@
         header { padding: 20px 30px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px; }
         .logo-circle { width: 45px; height: 45px; background: linear-gradient(45deg, var(--primary), #00D4FF); border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 24px; }
         #chat-window { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 20px; }
-        .welcome-screen { text-align: center; margin: auto; animation: fadeIn 0.8s ease; }
+        .welcome-screen { text-align: center; margin: auto; animation: fadeIn 0.8s ease; width: 100%; }
         .suggestion-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; width: 100%; max-width: 800px; margin: 25px auto; }
         .suggestion-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 18px; border-radius: 16px; cursor: pointer; transition: 0.3s; text-align: left; font-size: 13px; color: #cbd5e1; font-weight: 500; display: flex; align-items: center; gap: 12px; }
         .suggestion-card:hover { border-color: #00D4FF; background: rgba(255,255,255,0.08); transform: translateY(-2px); }
@@ -30,7 +30,7 @@
         .bubble { padding: 12px 18px; border-radius: 18px; font-size: 14.5px; line-height: 1.6; }
         .bot-bubble { background: rgba(255,255,255,0.08); border: 1px solid var(--border); border-top-left-radius: 4px; }
         .user-bubble { background: var(--primary); border-top-right-radius: 4px; }
-        .input-area { padding: 20px 30px 30px; }
+        .input-area { padding: 20px 30px 30px; border-top: none; }
         .input-wrapper { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 100px; display: flex; padding: 6px 12px 6px 20px; align-items: center; }
         input { flex: 1; background: transparent; border: none; color: white; outline: none; padding: 10px 0; font-size: 15px; }
         .icon-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: transparent; color: #94a3b8; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; }
@@ -52,3 +52,99 @@
         </header>
 
         <div id="chat-window">
+            <div id="welcome-screen" class="welcome-screen">
+                <h2 style="font-size: 32px; margin-bottom: 8px;">Halo, saya NusaBot</h2>
+                <p style="opacity: 0.7;">Mau eksplor destinasi autentik mana kita hari ini?</p>
+                <div class="suggestion-grid">
+                    <div class="suggestion-card" onclick="sendSuggested('Siapakah Anda?')"><i class="fas fa-id-badge" style="color:#00D4FF"></i> Siapakah Anda?</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Buatkan itinerary 3 hari di Kota Malang')"><i class="fas fa-map-location-dot" style="color:#00D4FF"></i> Itinerary 3 hari di Malang</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Rekomendasi wisata Bali untuk sunrise')"><i class="fas fa-sun" style="color:#00D4FF"></i> Wisata Bali untuk sunrise</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Layanan TravelMate')"><i class="fas fa-camera" style="color:#00D4FF"></i> Layanan TravelMate</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Nusa Bot & SmartNusa')"><i class="fas fa-paper-plane" style="color:#00D4FF"></i> Nusa Bot & SmartNusa</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Hidden gems Indonesia')"><i class="fas fa-gem" style="color:#00D4FF"></i> Hidden gems Indonesia</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-wrapper">
+                <input type="text" id="user-input" placeholder="Tanyakan rute atau destinasi..." onkeypress="if(event.key==='Enter')sendMessage()">
+                <button id="mic-btn" class="icon-btn" title="Gunakan Suara" onclick="startDictation()"><i class="fas fa-microphone"></i></button>
+                <button class="icon-btn send-btn" title="Kirim Pesan" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatWindow = document.getElementById('chat-window');
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const micBtn = document.getElementById('mic-btn');
+
+        // Fungsi Voice ke Teks (Microphone)
+        function startDictation() {
+            if (window.hasOwnProperty('webkitSpeechRecognition')) {
+                const recognition = new webkitSpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = "id-ID";
+                recognition.start();
+
+                micBtn.style.color = "#ff4b2b"; // Berubah merah saat merekam
+                micBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+
+                recognition.onresult = function(e) {
+                    document.getElementById('user-input').value = e.results[0][0].transcript;
+                    recognition.stop();
+                    resetMicBtn();
+                    sendMessage();
+                };
+                recognition.onerror = () => { recognition.stop(); resetMicBtn(); };
+            } else { 
+                alert("Browser tidak mendukung fitur suara."); 
+            }
+        }
+
+        function resetMicBtn() {
+            micBtn.style.color = "#94a3b8";
+            micBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            // Sembunyikan layar selamat datang saat chat dimulai
+            if (welcomeScreen) welcomeScreen.style.display = 'none';
+            
+            appendMessage('user', message);
+            input.value = '';
+
+            try {
+                const res = await fetch('/api/chat', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ message }) 
+                });
+                const data = await res.json();
+                appendMessage('bot', data.reply || "Maaf, terjadi gangguan teknis.");
+            } catch (e) { 
+                appendMessage('bot', 'Maaf, server sedang sibuk. Silakan coba lagi.'); 
+            }
+        }
+
+        function sendSuggested(t) { 
+            document.getElementById('user-input').value = t; 
+            sendMessage(); 
+        }
+
+        function appendMessage(sender, text) {
+            const div = document.createElement('div'); 
+            div.className = `message ${sender}-message`;
+            div.innerHTML = `<div class="avatar ${sender}-avatar"><i class="fas fa-${sender==='bot'?'robot':'user'}"></i></div><div class="bubble ${sender}-bubble">${text}</div>`;
+            chatWindow.appendChild(div);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+    </script>
+</body>
+</html>
