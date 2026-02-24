@@ -50,7 +50,7 @@ GAYA BAHASA:
   } catch (error) {
     console.error("Error API:", error.message);
     res.status(200).json({ 
-      reply: "Maaf Boss, sepertinya kunci akses (API Key) sedang bermasalah atau limit. Silakan cek konfigurasi Vercel Anda!" 
+      reply: "Maaf Nusa AI Chatbot sedang unavailable, silahkan hubungi CTO (Dyandra)" 
     });
   }
 }
