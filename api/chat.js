@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// Mengambil kunci dari Vercel
+const apiKey = process.env.GEMINI_API_KEY;
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -10,10 +11,16 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
+    // Pengecekan pertama: Apakah Vercel berhasil membaca API Key?
+    if (!apiKey) {
+      throw new Error("API_KEY_KOSONG: Vercel tidak menemukan GEMINI_API_KEY di Environment Variables.");
+    }
+
+    const genAI = new GoogleGenerativeAI(apiKey);
     const { message } = req.body;
     
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash", // Tetap di Flash 1.5 untuk kuota 1500 RPD
+      model: "gemini-1.5-flash", 
       systemInstruction: `
 Kamu adalah NusaBot, representasi teknologi dari Nusa AI yang cerdas, ramah, dan sangat ahli dalam pariwisata Indonesia.
 
@@ -48,9 +55,10 @@ GAYA BAHASA:
     
     res.status(200).json({ reply: response.text() });
   } catch (error) {
-    console.error("Error API:", error.message);
+    console.error("Detail Error:", error);
+    // Jika gagal, bot akan menampilkan error spesifik dari Google agar kita tidak menebak-nebak
     res.status(200).json({ 
-      reply: "Maaf Nusa AI Chatbot sedang unavailable, silahkan hubungi CTO (Dyandra)" 
+      reply: `Sistem Gagal: ${error.message}` 
     });
   }
 }
