@@ -27,7 +27,7 @@
         .avatar { width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; }
         .bot-avatar { background: var(--primary); border: 2px solid rgba(255,255,255,0.2); }
         .user-avatar { background: #64748b; }
-        .bubble { padding: 12px 18px; border-radius: 18px; font-size: 14.5px; line-height: 1.6; }
+        .bubble { padding: 12px 18px; border-radius: 18px; font-size: 14.5px; line-height: 1.6; word-wrap: break-word; }
         .bot-bubble { background: rgba(255,255,255,0.08); border: 1px solid var(--border); border-top-left-radius: 4px; }
         .user-bubble { background: var(--primary); border-top-right-radius: 4px; }
         .input-area { padding: 20px 30px 30px; border-top: none; }
@@ -59,7 +59,6 @@
                     <div class="suggestion-card" onclick="sendSuggested('Siapakah Anda?')"><i class="fas fa-id-badge" style="color:#00D4FF"></i> Siapakah Anda?</div>
                     <div class="suggestion-card" onclick="sendSuggested('Buatkan itinerary 3 hari di Kota Malang')"><i class="fas fa-map-location-dot" style="color:#00D4FF"></i> Itinerary 3 hari di Malang</div>
                     <div class="suggestion-card" onclick="sendSuggested('Rekomendasi wisata Bali untuk sunrise')"><i class="fas fa-sun" style="color:#00D4FF"></i> Wisata Bali untuk sunrise</div>
-                    
                     <div class="suggestion-card" onclick="sendSuggested('Apa itu Nusa AI?')"><i class="fas fa-robot" style="color:#00D4FF"></i> Apa itu Nusa AI?</div>
                     <div class="suggestion-card" onclick="sendSuggested('Jelaskan konsep Human-in-the-Loop (HITL) di Nusa AI')"><i class="fas fa-hands-holding-circle" style="color:#00D4FF"></i> Konsep Human-in-the-Loop</div>
                     <div class="suggestion-card" onclick="sendSuggested('Cari hidden gems di Indonesia')"><i class="fas fa-gem" style="color:#00D4FF"></i> Hidden gems Indonesia</div>
@@ -90,7 +89,7 @@
                 recognition.lang = "id-ID";
                 recognition.start();
 
-                micBtn.style.color = "#ff4b2b"; // Berubah merah saat merekam
+                micBtn.style.color = "#ff4b2b"; 
                 micBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
 
                 recognition.onresult = function(e) {
@@ -110,12 +109,30 @@
             micBtn.innerHTML = '<i class="fas fa-microphone"></i>';
         }
 
+        // --- FUNGSI FORMATTER TEKS (BARU) ---
+        function formatText(text) {
+            if (!text) return "";
+            
+            // 1. Ubah list berawalan bintang (*) atau strip (-) jadi bullet yang rapi
+            let formatted = text.replace(/^[\*\-]\s+/gm, '• ');
+            
+            // 2. Ubah format tebal **teks** menjadi HTML <strong>
+            formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            // 3. Ubah format miring *teks* menjadi HTML <em>
+            formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            
+            // 4. Ubah enter (\n) menjadi HTML <br> agar paragraf turun ke bawah
+            formatted = formatted.replace(/\n/g, '<br>');
+            
+            return formatted;
+        }
+
         async function sendMessage() {
             const input = document.getElementById('user-input');
             const message = input.value.trim();
             if (!message) return;
             
-            // Sembunyikan layar selamat datang saat chat dimulai
             if (welcomeScreen) welcomeScreen.style.display = 'none';
             
             appendMessage('user', message);
@@ -142,7 +159,11 @@
         function appendMessage(sender, text) {
             const div = document.createElement('div'); 
             div.className = `message ${sender}-message`;
-            div.innerHTML = `<div class="avatar ${sender}-avatar"><i class="fas fa-${sender==='bot'?'robot':'user'}"></i></div><div class="bubble ${sender}-bubble">${text}</div>`;
+            
+            // Terapkan formatter khusus untuk pesan dari bot
+            const displayText = sender === 'bot' ? formatText(text) : text;
+            
+            div.innerHTML = `<div class="avatar ${sender}-avatar"><i class="fas fa-${sender==='bot'?'robot':'user'}"></i></div><div class="bubble ${sender}-bubble">${displayText}</div>`;
             chatWindow.appendChild(div);
             chatWindow.scrollTop = chatWindow.scrollHeight;
         }
