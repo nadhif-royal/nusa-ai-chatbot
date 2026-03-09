@@ -46,14 +46,14 @@
         <header>
             <div class="logo-circle"><i class="fas fa-robot"></i></div>
             <div>
-                <h1 style="font-size: 18px;">Nusa AI</h1>
-                <p style="font-size: 11px; opacity: 0.6;"><i class="fas fa-circle" style="color: #10b981; font-size: 7px;"></i> Smart Travel Assistant • Trio Ngalam</p>
+                <h1 style="font-size: 18px;">Nusa AI Chatbot</h1>
+                <p style="font-size: 11px; opacity: 0.6;"><i class="fas fa-circle" style="color: #10b981; font-size: 7px;"></i> Smart Travel Assistant • SmartNusa</p>
             </div>
         </header>
 
         <div id="chat-window">
             <div id="welcome-screen" class="welcome-screen">
-                <h2 style="font-size: 32px; margin-bottom: 8px;">Halo, saya NusaBot</h2>
+                <h2 style="font-size: 32px; margin-bottom: 8px;">Halo, saya Nusa Bot</h2>
                 <p style="opacity: 0.7;">Mau eksplor destinasi autentik mana kita hari ini?</p>
                 <div class="suggestion-grid">
                     <div class="suggestion-card" onclick="sendSuggested('Siapakah Anda?')"><i class="fas fa-id-badge" style="color:#00D4FF"></i> Siapakah Anda?</div>
@@ -109,20 +109,20 @@
             micBtn.innerHTML = '<i class="fas fa-microphone"></i>';
         }
 
-        // --- FUNGSI FORMATTER TEKS (BARU) ---
+        // Fungsi Formatter Teks (Bold & Enter)
         function formatText(text) {
             if (!text) return "";
             
-            // 1. Ubah list berawalan bintang (*) atau strip (-) jadi bullet yang rapi
+            // Ubah list berawalan bintang (*) atau strip (-) jadi bullet yang rapi
             let formatted = text.replace(/^[\*\-]\s+/gm, '• ');
             
-            // 2. Ubah format tebal **teks** menjadi HTML <strong>
+            // Ubah format tebal **teks** menjadi HTML <strong>
             formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             
-            // 3. Ubah format miring *teks* menjadi HTML <em>
+            // Ubah format miring *teks* menjadi HTML <em>
             formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
             
-            // 4. Ubah enter (\n) menjadi HTML <br> agar paragraf turun ke bawah
+            // Ubah enter (\n) menjadi HTML <br> agar paragraf turun ke bawah
             formatted = formatted.replace(/\n/g, '<br>');
             
             return formatted;
