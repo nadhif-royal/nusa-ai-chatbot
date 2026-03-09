@@ -3,42 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nusa AI - Smart Travel Assistant</title>
+    <title>SmartNusa - Smart Travel Assistant</title>
     
-    <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" rx="32" fill="%23007BFF"/><path fill="%23FFF" d="M64 20c-13.2 0-24 10.8-24 24v8H28c-4.4 0-8 3.6-8 8v48c0 4.4 3.6 8 8 8h72c4.4 0 8-3.6 8-8V60c0-4.4-3.6-8-8-8H88v-8c0-13.2-10.8-24-24-24zm0 16c4.4 0 8 3.6 8 8v8H56v-8c0-4.4 3.6-8 8-8zM44 68a8 8 0 1 1 16 0 8 8 0 1 1-16 0zm24 0a8 8 0 1 1 16 0 8 8 0 1 1-16 0z"/></svg>'>
+    <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" rx="32" fill="%2300ACC1"/><path fill="%23FFF" d="M64 20c-13.2 0-24 10.8-24 24v8H28c-4.4 0-8 3.6-8 8v48c0 4.4 3.6 8 8 8h72c4.4 0 8-3.6 8-8V60c0-4.4-3.6-8-8-8H88v-8c0-13.2-10.8-24-24-24zm0 16c4.4 0 8 3.6 8 8v8H56v-8c0-4.4 3.6-8 8-8zM44 68a8 8 0 1 1 16 0 8 8 0 1 1-16 0zm24 0a8 8 0 1 1 16 0 8 8 0 1 1-16 0z"/></svg>'>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary: #007BFF; --glass: rgba(255, 255, 255, 0.05); --border: rgba(255, 255, 255, 0.1); }
+        /* Mengambil Palet Warna dari Logo SmartNusa */
+        :root { 
+            --teal-smart: #00ACC1; /* Warna biru laut dari tulisan 'Smart' */
+            --orange-nusa: #FF9800; /* Warna jingga dari tulisan 'Nusa' */
+            --green-island: #8BC34A; /* Warna hijau dari bukit/pohon kelapa */
+            --glass-bg: rgba(10, 25, 47, 0.75); /* Kaca gelap kebiruan agar kontras */
+            --border: rgba(255, 255, 255, 0.15); 
+            --text-main: #F8FAFC;
+        }
+        
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: #0f172a; height: 100vh; display: flex; justify-content: center; align-items: center; color: white; overflow: hidden; position: relative; }
-        body::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1920&q=80'); background-size: cover; opacity: 0.1; z-index: -1; }
-        .main-container { width: 95%; max-width: 900px; height: 90vh; background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 24px; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        
+        body { 
+            background-color: #020617; 
+            height: 100vh; display: flex; justify-content: center; align-items: center; 
+            color: var(--text-main); overflow: hidden; position: relative; 
+        }
+        
+        /* Background Pantai dari URL yang direquest */
+        body::before { 
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTe0qzTmg4OEP2a2-9vnB4k9WKfPWU9wdqgDQ&s'); 
+            background-size: cover; background-position: center; 
+            opacity: 0.35; /* Transparansi pas agar tidak menyilaukan mata */
+            z-index: -1; 
+        }
+
+        /* Container Chat dengan efek Glassmorphism segar */
+        .main-container { 
+            width: 95%; max-width: 900px; height: 90vh; 
+            background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border); border-radius: 24px; display: flex; flex-direction: column; 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); 
+        }
+
         header { padding: 20px 30px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px; }
-        .logo-circle { width: 45px; height: 45px; background: linear-gradient(45deg, var(--primary), #00D4FF); border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 24px; }
+        
+        /* Logo Circle dengan gradasi Tropical (Teal ke Hijau) */
+        .logo-circle { 
+            width: 45px; height: 45px; 
+            background: linear-gradient(135deg, var(--teal-smart), var(--green-island)); 
+            border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 24px; color: white;
+            box-shadow: 0 4px 10px rgba(0, 172, 193, 0.3);
+        }
+        
         #chat-window { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 20px; }
         .welcome-screen { text-align: center; margin: auto; animation: fadeIn 0.8s ease; width: 100%; }
+        
+        /* Judul Welcome dengan sentuhan warna logo */
+        .welcome-title { font-size: 32px; margin-bottom: 8px; font-weight: 700; }
+        .welcome-subtitle { opacity: 0.8; font-weight: 300; margin-bottom: 10px; }
+
         .suggestion-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; width: 100%; max-width: 800px; margin: 25px auto; }
-        .suggestion-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 18px; border-radius: 16px; cursor: pointer; transition: 0.3s; text-align: left; font-size: 13px; color: #cbd5e1; font-weight: 500; display: flex; align-items: center; gap: 12px; }
-        .suggestion-card:hover { border-color: #00D4FF; background: rgba(255,255,255,0.08); transform: translateY(-2px); }
+        
+        /* Kartu Sugesti Elegan */
+        .suggestion-card { 
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border); 
+            padding: 18px; border-radius: 16px; cursor: pointer; transition: all 0.3s ease; 
+            text-align: left; font-size: 13.5px; color: #e2e8f0; font-weight: 500; 
+            display: flex; align-items: center; gap: 12px; 
+        }
+        .suggestion-card:hover { 
+            border-color: var(--teal-smart); background: rgba(0, 172, 193, 0.15); 
+            transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0, 172, 193, 0.2); 
+        }
+        
         .message { display: flex; gap: 12px; max-width: 85%; animation: slideUp 0.3s ease-out; margin-bottom: 10px; }
         .user-message { align-self: flex-end; flex-direction: row-reverse; }
-        .avatar { width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; }
-        .bot-avatar { background: var(--primary); border: 2px solid rgba(255,255,255,0.2); }
-        .user-avatar { background: #64748b; }
-        .bubble { padding: 12px 18px; border-radius: 18px; font-size: 14.5px; line-height: 1.6; word-wrap: break-word; }
-        .bot-bubble { background: rgba(255,255,255,0.08); border: 1px solid var(--border); border-top-left-radius: 4px; }
-        .user-bubble { background: var(--primary); border-top-right-radius: 4px; }
+        
+        .avatar { width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; color: white; }
+        .bot-avatar { background: var(--teal-smart); border: 2px solid rgba(255,255,255,0.2); }
+        .user-avatar { background: var(--orange-nusa); border: 2px solid rgba(255,255,255,0.2); } /* User pakai warna Orange Nusa */
+        
+        .bubble { padding: 14px 20px; border-radius: 18px; font-size: 14.5px; line-height: 1.6; word-wrap: break-word; }
+        
+        /* Bubble Bot: Transparan Teal (Fresh) */
+        .bot-bubble { 
+            background: rgba(0, 172, 193, 0.15); 
+            border: 1px solid rgba(0, 172, 193, 0.3); 
+            border-top-left-radius: 4px; 
+            color: #f8fafc;
+        }
+        
+        /* Bubble User: Gradasi Orange Nusa (Eye-catching) */
+        .user-bubble { 
+            background: linear-gradient(135deg, var(--orange-nusa), #E65100); 
+            border-top-right-radius: 4px; 
+            color: white; box-shadow: 0 4px 10px rgba(255, 152, 0, 0.2);
+        }
+        
         .input-area { padding: 20px 30px 30px; border-top: none; }
-        .input-wrapper { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 100px; display: flex; padding: 6px 12px 6px 20px; align-items: center; }
+        .input-wrapper { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 100px; display: flex; padding: 6px 12px 6px 20px; align-items: center; transition: 0.3s; }
+        .input-wrapper:focus-within { border-color: var(--teal-smart); box-shadow: 0 0 0 2px rgba(0, 172, 193, 0.2); background: rgba(0,0,0,0.4); }
         input { flex: 1; background: transparent; border: none; color: white; outline: none; padding: 10px 0; font-size: 15px; }
-        .icon-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: transparent; color: #94a3b8; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; }
-        .icon-btn:hover { color: #00D4FF; }
-        .send-btn { background: var(--primary); color: white; margin-left: 10px; }
-        .send-btn:hover { background: #00D4FF; transform: scale(1.05); }
+        input::placeholder { color: #94a3b8; }
+        
+        .icon-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: transparent; color: #94a3b8; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; font-size: 16px; }
+        .icon-btn:hover { color: var(--teal-smart); }
+        .send-btn { background: var(--teal-smart); color: white; margin-left: 10px; }
+        .send-btn:hover { background: var(--orange-nusa); color: white; transform: scale(1.05); }
+
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Format teks tambahan untuk tebal dll */
+        strong { color: var(--orange-nusa); font-weight: 700; }
     </style>
 </head>
 <body>
@@ -46,29 +123,29 @@
         <header>
             <div class="logo-circle"><i class="fas fa-robot"></i></div>
             <div>
-                <h1 style="font-size: 18px;">Nusa AI Chatbot</h1>
-                <p style="font-size: 11px; opacity: 0.6;"><i class="fas fa-circle" style="color: #10b981; font-size: 7px;"></i> Smart Travel Assistant • SmartNusa</p>
+                <h1 style="font-size: 18px; font-weight: 700; color: white;">Nusa AI Chatbot</h1>
+                <p style="font-size: 11px; opacity: 0.8;"><i class="fas fa-circle" style="color: var(--green-island); font-size: 8px; margin-right: 4px;"></i> Smart Travel Assistant • SmartNusa</p>
             </div>
         </header>
 
         <div id="chat-window">
             <div id="welcome-screen" class="welcome-screen">
-                <h2 style="font-size: 32px; margin-bottom: 8px;">Halo, saya Nusa Bot</h2>
-                <p style="opacity: 0.7;">Mau eksplor destinasi autentik mana kita hari ini?</p>
+                <h2 class="welcome-title">Halo, saya Nusa Bot</h2>
+                <p class="welcome-subtitle">Mau eksplor destinasi autentik mana kita hari ini?</p>
                 <div class="suggestion-grid">
-                    <div class="suggestion-card" onclick="sendSuggested('Siapakah Anda?')"><i class="fas fa-id-badge" style="color:#00D4FF"></i> Siapakah Anda?</div>
-                    <div class="suggestion-card" onclick="sendSuggested('Buatkan itinerary 3 hari di Kota Malang')"><i class="fas fa-map-location-dot" style="color:#00D4FF"></i> Itinerary 3 hari di Malang</div>
-                    <div class="suggestion-card" onclick="sendSuggested('Rekomendasi wisata Bali untuk sunrise')"><i class="fas fa-sun" style="color:#00D4FF"></i> Wisata Bali untuk sunrise</div>
-                    <div class="suggestion-card" onclick="sendSuggested('Apa itu Nusa AI?')"><i class="fas fa-robot" style="color:#00D4FF"></i> Apa itu Nusa AI?</div>
-                    <div class="suggestion-card" onclick="sendSuggested('Jelaskan konsep Human-in-the-Loop (HITL) di Nusa AI')"><i class="fas fa-hands-holding-circle" style="color:#00D4FF"></i> Konsep Human-in-the-Loop</div>
-                    <div class="suggestion-card" onclick="sendSuggested('Cari hidden gems di Indonesia')"><i class="fas fa-gem" style="color:#00D4FF"></i> Hidden gems Indonesia</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Siapakah Anda?')"><i class="fas fa-id-badge" style="color:var(--teal-smart); font-size:18px;"></i> Siapakah Anda?</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Buatkan itinerary 3 hari di Kota Malang')"><i class="fas fa-map-location-dot" style="color:var(--orange-nusa); font-size:18px;"></i> Itinerary 3 hari di Malang</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Rekomendasi wisata Bali untuk sunrise')"><i class="fas fa-sun" style="color:var(--orange-nusa); font-size:18px;"></i> Wisata Bali untuk sunrise</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Apa itu Nusa AI?')"><i class="fas fa-robot" style="color:var(--teal-smart); font-size:18px;"></i> Apa itu Nusa AI?</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Jelaskan konsep Human-in-the-Loop (HITL) di Nusa AI')"><i class="fas fa-hands-holding-circle" style="color:var(--teal-smart); font-size:18px;"></i> Konsep Human-in-the-Loop</div>
+                    <div class="suggestion-card" onclick="sendSuggested('Cari hidden gems di Indonesia')"><i class="fas fa-gem" style="color:var(--green-island); font-size:18px;"></i> Hidden gems Indonesia</div>
                 </div>
             </div>
         </div>
 
         <div class="input-area">
             <div class="input-wrapper">
-                <input type="text" id="user-input" placeholder="Tanyakan rute atau destinasi..." onkeypress="if(event.key==='Enter')sendMessage()">
+                <input type="text" id="user-input" placeholder="Tanyakan rute atau destinasi wisata..." onkeypress="if(event.key==='Enter')sendMessage()">
                 <button id="mic-btn" class="icon-btn" title="Gunakan Suara" onclick="startDictation()"><i class="fas fa-microphone"></i></button>
                 <button class="icon-btn send-btn" title="Kirim Pesan" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
             </div>
@@ -89,7 +166,7 @@
                 recognition.lang = "id-ID";
                 recognition.start();
 
-                micBtn.style.color = "#ff4b2b"; 
+                micBtn.style.color = "var(--orange-nusa)"; 
                 micBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
 
                 recognition.onresult = function(e) {
