@@ -122,6 +122,12 @@
         }
 
         #chat-window { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 20px; }
+        
+        /* Modifikasi scrollbar agar cantik */
+        #chat-window::-webkit-scrollbar { width: 6px; }
+        #chat-window::-webkit-scrollbar-track { background: transparent; }
+        #chat-window::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        
         .welcome-screen { text-align: center; margin: auto; animation: fadeIn 0.8s ease; width: 100%; }
         
         .welcome-title { font-size: 32px; margin-bottom: 8px; font-weight: 700; color: var(--text-main); transition: color 0.4s ease; }
@@ -156,7 +162,7 @@
             border-top-left-radius: 4px; color: var(--text-main);
             box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
-        .user-bubble { background: var(--user-bubble-bg); border-top-right-radius: 4px; color: white; }
+        .user-bubble { background: var(--user-bubble-bg); border-top-right-radius: 4px; color: white; white-space: pre-wrap; } /* white-space ditambahkan agar Enter terbaca */
         
         /* === HEADERS === */
         .bubble h1, .bubble h2, .bubble h3, .bubble h4 { 
@@ -173,21 +179,14 @@
         strong { color: #0284C7; font-weight: 700; transition: color 0.4s ease; }
         [data-theme="dark"] strong { color: var(--teal-smart); }
 
-        /* === PERBAIKAN TYPING INDICATOR === */
+        /* === TYPING INDICATOR === */
         .typing-indicator {
-            display: flex !important; 
-            align-items: center; 
-            gap: 6px; 
-            padding: 15px 22px !important;
-            min-height: 24px; /* Memaksa bubble agar tidak gepeng */
+            display: flex !important; align-items: center; gap: 6px; 
+            padding: 15px 22px !important; min-height: 24px;
         }
         .typing-dot {
-            width: 8px; 
-            height: 8px; 
-            background-color: var(--teal-smart);
-            border-radius: 50%;
-            animation: bounce 1.4s infinite ease-in-out both;
-            display: inline-block;
+            width: 8px; height: 8px; background-color: var(--teal-smart);
+            border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; display: inline-block;
         }
         .typing-dot:nth-child(1) { animation-delay: -0.32s; }
         .typing-dot:nth-child(2) { animation-delay: -0.16s; }
@@ -198,14 +197,34 @@
             40% { transform: scale(1); opacity: 1; }
         }
 
+        /* === PERUBAHAN INPUT AREA MENJADI TEXTAREA (SEPERTI CHATGPT) === */
         .input-area { padding: 20px 30px 30px; border-top: none; background: var(--header-bg); border-radius: 0 0 24px 24px; transition: background 0.4s ease; }
         
-        .input-wrapper { background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 100px; display: flex; padding: 6px 12px 6px 20px; align-items: center; transition: 0.3s; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        .input-wrapper { 
+            background: var(--input-bg); border: 1px solid var(--input-border); 
+            border-radius: 24px; /* diubah dari 100px agar membulat fleksibel saat tumbuh tinggi */
+            display: flex; padding: 10px 12px 10px 20px; 
+            align-items: flex-end; /* Memastikan tombol selalu di bawah saat text area membesar */
+            transition: 0.3s; box-shadow: 0 2px 10px rgba(0,0,0,0.03); 
+        }
         .input-wrapper:focus-within { border-color: var(--teal-smart); box-shadow: 0 0 0 3px rgba(0, 172, 193, 0.15); }
-        input { flex: 1; background: transparent; border: none; color: var(--text-main); outline: none; padding: 10px 0; font-size: 15px; font-weight: 500; transition: color 0.4s ease; }
-        input::placeholder { color: var(--text-muted); font-weight: 400; transition: color 0.4s ease; }
         
-        .icon-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: transparent; color: var(--text-muted); cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; font-size: 16px; }
+        /* Mengubah styling untuk Textarea */
+        textarea { 
+            flex: 1; background: transparent; border: none; color: var(--text-main); outline: none; 
+            padding: 8px 0; font-size: 15px; font-weight: 500; font-family: inherit; line-height: 1.5;
+            transition: color 0.4s ease; resize: none; overflow-y: auto; max-height: 150px;
+        }
+        textarea::-webkit-scrollbar { width: 5px; }
+        textarea::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        textarea::placeholder { color: var(--text-muted); font-weight: 400; transition: color 0.4s ease; }
+        
+        .icon-btn { 
+            width: 40px; height: 40px; border-radius: 50%; border: none; background: transparent; 
+            color: var(--text-muted); cursor: pointer; transition: 0.3s; 
+            display: flex; justify-content: center; align-items: center; font-size: 16px; 
+            margin-bottom: 2px; /* Menyelaraskan posisi tombol */
+        }
         .icon-btn:hover { color: var(--teal-smart); background: var(--icon-hover-bg); }
         .send-btn { background: var(--teal-smart); color: white; margin-left: 10px; }
         .send-btn:hover { background: var(--orange-nusa); color: white; transform: scale(1.05); }
@@ -246,7 +265,7 @@
 
         <div class="input-area">
             <div class="input-wrapper">
-                <input type="text" id="user-input" placeholder="Tanyakan rute atau destinasi wisata..." onkeypress="if(event.key==='Enter')sendMessage()">
+                <textarea id="user-input" rows="1" placeholder="Tanyakan rute atau destinasi wisata... (Shift+Enter untuk baris baru)"></textarea>
                 <button id="mic-btn" class="icon-btn" title="Gunakan Suara" onclick="startDictation()"><i class="fas fa-microphone"></i></button>
                 <button class="icon-btn send-btn" title="Kirim Pesan" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
             </div>
@@ -257,8 +276,24 @@
         const chatWindow = document.getElementById('chat-window');
         const welcomeScreen = document.getElementById('welcome-screen');
         const micBtn = document.getElementById('mic-btn');
+        const userInput = document.getElementById('user-input');
         const themeIcon = document.querySelector('#theme-toggle i');
         const themeBtn = document.getElementById('theme-toggle');
+
+        /* === SISTEM AUTO-RESIZE TEXTAREA === */
+        userInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+            if(this.value === '') this.style.height = 'auto'; // Reset saat kosong
+        });
+
+        /* === SISTEM ENTER (Shift+Enter untuk garis baru, Enter untuk kirim) === */
+        userInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // Mencegah enter membuat baris baru
+                sendMessage();
+            }
+        });
 
         updateThemeIcon(document.documentElement.getAttribute('data-theme'));
 
@@ -292,7 +327,8 @@
                 micBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
 
                 recognition.onresult = function(e) {
-                    document.getElementById('user-input').value = e.results[0][0].transcript;
+                    userInput.value = e.results[0][0].transcript;
+                    userInput.dispatchEvent(new Event('input')); // Trigger auto-resize
                     recognition.stop();
                     resetMicBtn();
                     sendMessage();
@@ -327,11 +363,8 @@
             return formatted;
         }
 
-        // FUNGSI ANIMASI TYPING YANG DIPERKUAT
         function showTypingIndicator() {
-            // Cegah duplikasi jika user klik berkali-kali
             if (document.getElementById('typing-indicator-bubble')) return;
-
             const div = document.createElement('div'); 
             div.className = `message bot-message`;
             div.id = 'typing-indicator-bubble'; 
@@ -351,17 +384,54 @@
             if (indicator) indicator.remove();
         }
 
+        /* === FUNGSI TYPEWRITER (MENGETIK PERLAHAN) === */
+        function typeWriterHTML(element, htmlString, speed = 10) {
+            let i = 0;
+            let text = "";
+            element.innerHTML = ""; // Kosongkan bubble sebelum animasi
+            
+            function type() {
+                if (i < htmlString.length) {
+                    let char = htmlString.charAt(i);
+                    
+                    // Memastikan tag HTML (seperti <strong>, <h1>, <br>) dimasukkan sekaligus tanpa dirusak
+                    if (char === '<') {
+                        let tagIndex = htmlString.indexOf('>', i);
+                        if (tagIndex !== -1) {
+                            text += htmlString.substring(i, tagIndex + 1);
+                            i = tagIndex + 1;
+                        }
+                    } else {
+                        text += char;
+                        i++;
+                    }
+                    
+                    element.innerHTML = text;
+                    chatWindow.scrollTop = chatWindow.scrollHeight; // Auto-scroll sangat mulus ke bawah
+                    
+                    let delay = speed;
+                    // Sedikit jeda saat menemui tanda baca agar lebih natural (opsional)
+                    if (['.', '!', '?', ':'].includes(char)) delay += 150;
+                    
+                    setTimeout(type, delay);
+                }
+            }
+            type();
+        }
+
         async function sendMessage() {
-            const input = document.getElementById('user-input');
-            const message = input.value.trim();
+            const message = userInput.value.trim();
             if (!message) return;
             
             if (welcomeScreen) welcomeScreen.style.display = 'none';
             
+            // Tampilkan pesan User
             appendMessage('user', message);
-            input.value = '';
+            
+            // Kosongkan dan reset ukuran textbox
+            userInput.value = '';
+            userInput.style.height = 'auto';
 
-            // Tampilkan titik mengetik (typing indicator)
             showTypingIndicator();
 
             try {
@@ -372,27 +442,51 @@
                 });
                 const data = await res.json();
                 
-                // Hapus titik mengetik setelah respon API datang
                 removeTypingIndicator();
-                appendMessage('bot', data.reply || "Maaf, terjadi gangguan teknis.");
+                
+                // MENGIRIM JAWABAN BOT DENGAN ANIMASI KETIK (True)
+                appendMessage('bot', data.reply || "Maaf, terjadi gangguan teknis.", true);
             } catch (e) { 
                 removeTypingIndicator();
-                appendMessage('bot', 'Maaf, server sedang sibuk. Silakan coba lagi.'); 
+                appendMessage('bot', 'Maaf, server sedang sibuk. Silakan coba lagi.', false); 
             }
         }
 
         function sendSuggested(t) { 
-            document.getElementById('user-input').value = t; 
+            userInput.value = t; 
+            userInput.dispatchEvent(new Event('input')); // Trigger auto-resize
             sendMessage(); 
         }
 
-        function appendMessage(sender, text) {
+        // FUNGSI RENDER PESAN KE LAYAR 
+        function appendMessage(sender, text, animate = false) {
             const div = document.createElement('div'); 
             div.className = `message ${sender}-message`;
-            const displayText = sender === 'bot' ? formatText(text) : text;
-            div.innerHTML = `<div class="avatar ${sender}-avatar"><i class="fas fa-${sender==='bot'?'robot':'user'}"></i></div><div class="bubble ${sender}-bubble">${displayText}</div>`;
-            chatWindow.appendChild(div);
-            chatWindow.scrollTop = chatWindow.scrollHeight;
+            
+            const avatar = `<div class="avatar ${sender}-avatar"><i class="fas fa-${sender==='bot'?'robot':'user'}"></i></div>`;
+            const bubble = document.createElement('div');
+            bubble.className = `bubble ${sender}-bubble`;
+
+            if (sender === 'bot') {
+                const formattedText = formatText(text);
+                div.innerHTML = avatar;
+                div.appendChild(bubble);
+                chatWindow.appendChild(div);
+                
+                if (animate) {
+                    // Panggil fungsi efek mesin tik
+                    typeWriterHTML(bubble, formattedText, 15);
+                } else {
+                    bubble.innerHTML = formattedText;
+                    chatWindow.scrollTop = chatWindow.scrollHeight;
+                }
+            } else {
+                bubble.textContent = text;
+                div.innerHTML = avatar;
+                div.appendChild(bubble);
+                chatWindow.appendChild(div);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }
         }
     </script>
 </body>
