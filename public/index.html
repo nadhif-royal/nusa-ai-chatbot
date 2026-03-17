@@ -123,7 +123,6 @@
 
         #chat-window { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 20px; }
         
-        /* Modifikasi scrollbar agar cantik */
         #chat-window::-webkit-scrollbar { width: 6px; }
         #chat-window::-webkit-scrollbar-track { background: transparent; }
         #chat-window::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
@@ -162,7 +161,7 @@
             border-top-left-radius: 4px; color: var(--text-main);
             box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
-        .user-bubble { background: var(--user-bubble-bg); border-top-right-radius: 4px; color: white; white-space: pre-wrap; } /* white-space ditambahkan agar Enter terbaca */
+        .user-bubble { background: var(--user-bubble-bg); border-top-right-radius: 4px; color: white; white-space: pre-wrap; } 
         
         /* === HEADERS === */
         .bubble h1, .bubble h2, .bubble h3, .bubble h4 { 
@@ -197,19 +196,17 @@
             40% { transform: scale(1); opacity: 1; }
         }
 
-        /* === PERUBAHAN INPUT AREA MENJADI TEXTAREA (SEPERTI CHATGPT) === */
         .input-area { padding: 20px 30px 30px; border-top: none; background: var(--header-bg); border-radius: 0 0 24px 24px; transition: background 0.4s ease; }
         
         .input-wrapper { 
             background: var(--input-bg); border: 1px solid var(--input-border); 
-            border-radius: 24px; /* diubah dari 100px agar membulat fleksibel saat tumbuh tinggi */
+            border-radius: 24px; 
             display: flex; padding: 10px 12px 10px 20px; 
-            align-items: flex-end; /* Memastikan tombol selalu di bawah saat text area membesar */
+            align-items: flex-end; 
             transition: 0.3s; box-shadow: 0 2px 10px rgba(0,0,0,0.03); 
         }
         .input-wrapper:focus-within { border-color: var(--teal-smart); box-shadow: 0 0 0 3px rgba(0, 172, 193, 0.15); }
         
-        /* Mengubah styling untuk Textarea */
         textarea { 
             flex: 1; background: transparent; border: none; color: var(--text-main); outline: none; 
             padding: 8px 0; font-size: 15px; font-weight: 500; font-family: inherit; line-height: 1.5;
@@ -223,7 +220,7 @@
             width: 40px; height: 40px; border-radius: 50%; border: none; background: transparent; 
             color: var(--text-muted); cursor: pointer; transition: 0.3s; 
             display: flex; justify-content: center; align-items: center; font-size: 16px; 
-            margin-bottom: 2px; /* Menyelaraskan posisi tombol */
+            margin-bottom: 2px; 
         }
         .icon-btn:hover { color: var(--teal-smart); background: var(--icon-hover-bg); }
         .send-btn { background: var(--teal-smart); color: white; margin-left: 10px; }
@@ -280,17 +277,15 @@
         const themeIcon = document.querySelector('#theme-toggle i');
         const themeBtn = document.getElementById('theme-toggle');
 
-        /* === SISTEM AUTO-RESIZE TEXTAREA === */
         userInput.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = (this.scrollHeight) + 'px';
-            if(this.value === '') this.style.height = 'auto'; // Reset saat kosong
+            if(this.value === '') this.style.height = 'auto'; 
         });
 
-        /* === SISTEM ENTER (Shift+Enter untuk garis baru, Enter untuk kirim) === */
         userInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault(); // Mencegah enter membuat baris baru
+                e.preventDefault(); 
                 sendMessage();
             }
         });
@@ -328,7 +323,7 @@
 
                 recognition.onresult = function(e) {
                     userInput.value = e.results[0][0].transcript;
-                    userInput.dispatchEvent(new Event('input')); // Trigger auto-resize
+                    userInput.dispatchEvent(new Event('input')); 
                     recognition.stop();
                     resetMicBtn();
                     sendMessage();
@@ -384,36 +379,36 @@
             if (indicator) indicator.remove();
         }
 
-        /* === FUNGSI TYPEWRITER (MENGETIK PERLAHAN) === */
-        function typeWriterHTML(element, htmlString, speed = 10) {
+        /* === FUNGSI TYPEWRITER (DIPERCEPAT 4X LIPAT) === */
+        function typeWriterHTML(element, htmlString, speed = 2) {
             let i = 0;
             let text = "";
-            element.innerHTML = ""; // Kosongkan bubble sebelum animasi
+            element.innerHTML = ""; 
             
             function type() {
                 if (i < htmlString.length) {
-                    let char = htmlString.charAt(i);
-                    
-                    // Memastikan tag HTML (seperti <strong>, <h1>, <br>) dimasukkan sekaligus tanpa dirusak
-                    if (char === '<') {
-                        let tagIndex = htmlString.indexOf('>', i);
-                        if (tagIndex !== -1) {
-                            text += htmlString.substring(i, tagIndex + 1);
-                            i = tagIndex + 1;
+                    // Proses 4 karakter sekaligus untuk mempercepat drastis tapi tetap ada efek mengalir
+                    let charsToProcess = 4;
+                    while (charsToProcess > 0 && i < htmlString.length) {
+                        let char = htmlString.charAt(i);
+                        
+                        if (char === '<') {
+                            let tagIndex = htmlString.indexOf('>', i);
+                            if (tagIndex !== -1) {
+                                text += htmlString.substring(i, tagIndex + 1);
+                                i = tagIndex + 1;
+                            }
+                        } else {
+                            text += char;
+                            i++;
+                            charsToProcess--;
                         }
-                    } else {
-                        text += char;
-                        i++;
                     }
                     
                     element.innerHTML = text;
-                    chatWindow.scrollTop = chatWindow.scrollHeight; // Auto-scroll sangat mulus ke bawah
+                    chatWindow.scrollTop = chatWindow.scrollHeight; 
                     
-                    let delay = speed;
-                    // Sedikit jeda saat menemui tanda baca agar lebih natural (opsional)
-                    if (['.', '!', '?', ':'].includes(char)) delay += 150;
-                    
-                    setTimeout(type, delay);
+                    setTimeout(type, speed);
                 }
             }
             type();
@@ -425,10 +420,8 @@
             
             if (welcomeScreen) welcomeScreen.style.display = 'none';
             
-            // Tampilkan pesan User
             appendMessage('user', message);
             
-            // Kosongkan dan reset ukuran textbox
             userInput.value = '';
             userInput.style.height = 'auto';
 
@@ -444,7 +437,6 @@
                 
                 removeTypingIndicator();
                 
-                // MENGIRIM JAWABAN BOT DENGAN ANIMASI KETIK (True)
                 appendMessage('bot', data.reply || "Maaf, terjadi gangguan teknis.", true);
             } catch (e) { 
                 removeTypingIndicator();
@@ -454,11 +446,10 @@
 
         function sendSuggested(t) { 
             userInput.value = t; 
-            userInput.dispatchEvent(new Event('input')); // Trigger auto-resize
+            userInput.dispatchEvent(new Event('input')); 
             sendMessage(); 
         }
 
-        // FUNGSI RENDER PESAN KE LAYAR 
         function appendMessage(sender, text, animate = false) {
             const div = document.createElement('div'); 
             div.className = `message ${sender}-message`;
@@ -474,8 +465,7 @@
                 chatWindow.appendChild(div);
                 
                 if (animate) {
-                    // Panggil fungsi efek mesin tik
-                    typeWriterHTML(bubble, formattedText, 15);
+                    typeWriterHTML(bubble, formattedText, 2); // Kecepatan 2ms dengan proses 4 karakter/frame
                 } else {
                     bubble.innerHTML = formattedText;
                     chatWindow.scrollTop = chatWindow.scrollHeight;
