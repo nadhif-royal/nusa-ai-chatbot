@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const apiKey = process.env.GEMINI_API_KEY;
+const openRouterKey = process.env.OPENROUTER_API_KEY;
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -11,16 +12,13 @@ export default async function handler(req, res) {
 
   try {
     if (!apiKey) {
-      throw new Error("API_KEY_KOSONG: Vercel tidak menemukan GEMINI_API_KEY di Environment Variables.");
+      throw new Error("API_KEY_KOSONG");
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
     const { message } = req.body;
     
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash", 
-      systemInstruction: `
-Kamu adalah NusaBot, asisten AI cerdas yang menjadi "otak" di balik platform SmartNusa. Kamu memiliki dua peran utama: sebagai perwakilan visioner (untuk pitching kepada juri atau investor) dan sebagai Smart Travel Guide yang sangat ahli dalam pariwisata Indonesia.
+    const systemInstruction = `
+Kamu adalah Nusa Bot, asisten AI cerdas yang menjadi "otak" di balik platform SmartNusa. Kamu memiliki dua peran utama: sebagai perwakilan visioner (untuk pitching kepada juri atau investor) dan sebagai Smart Travel Guide yang sangat ahli dalam pariwisata Indonesia.
 
 IDENTITAS KREATOR (TRIO NGALAM):
 Kamu dikembangkan secara eksklusif oleh "Trio Ngalam" dari Fakultas Ilmu Komputer Universitas Brawijaya (FILKOM UB) angkatan 2023:
@@ -53,13 +51,53 @@ GUARDRAILS (BATASAN KETAT):
 * SANGAT PENTING: Dilarang keras menyebutkan nama atau brand "NusaPath". Kamu hanya boleh menggunakan nama "Nusa AI" (sebagai teknologinya) dan "SmartNusa" (sebagai platform aplikasinya).
 * Gunakan pemformatan teks Markdown yang rapi (gunakan bullet points, enter, dan **teks tebal** untuk poin penting). 
 * Bahasa: Ramah, profesional, elegan, dan sangat bangga akan kekayaan Nusantara.
-`
-    });
+`;
 
-    const result = await model.generateContent(message);
-    const response = await result.response;
+    try {
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-2.5-flash", 
+        systemInstruction: systemInstruction 
+      });
+
+      const result = await model.generateContent(message);
+      const response = await result.response;
+      res.status(200).json({ reply: response.text() });
+
+    } catch (geminiError) {
+      const errorMsg = geminiError.message || "";
+      
+      if (geminiError.status === 429 || errorMsg.includes("429") || errorMsg.includes("quota") || errorMsg.includes("limit")) {
+        console.log("Gemini kena limit! Pindah haluan ke OpenRouter");
+        
+        if (!openRouterKey) {
+            return res.status(200).json({ reply: "Sistem utama sedang sibuk dan kunci cadangan belum dipasang. Mohon tunggu sebentar ya!" });
+        }
+
+        const openRouterRes = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${openRouterKey}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "stepfun/step-1-8k",
+            messages: [
+              { role: "system", content: systemInstruction },
+              { role: "user", content: message }
+            ]
+          })
+        });
+
+        const data = await openRouterRes.json();
+        const fallbackReply = data.choices[0].message.content;
+        res.status(200).json({ reply: fallbackReply });
+        
+      } else {
+        throw geminiError;
+      }
+    }
     
-    res.status(200).json({ reply: response.text() });
   } catch (error) {
     console.error("Detail Error:", error);
     res.status(200).json({ 
