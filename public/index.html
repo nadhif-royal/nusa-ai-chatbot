@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* TEMA TERANG (LIGHT MODE) - Default */
+        /* TEMA TERANG (LIGHT MODE) */
         :root { 
             --teal-smart: #00ACC1; 
             --green-island: #8BC34A; 
@@ -109,7 +109,6 @@
             box-shadow: 0 4px 10px rgba(0, 172, 193, 0.2);
         }
         
-        /* Tombol Switch Tema */
         .theme-btn { 
             width: 42px; height: 42px; border-radius: 50%; 
             background: var(--card-bg); border: 1px solid var(--card-border);
@@ -159,7 +158,7 @@
         }
         .user-bubble { background: var(--user-bubble-bg); border-top-right-radius: 4px; color: white; }
         
-        /* === CSS TAMBAHAN UNTUK HEADERS (H1, H2, H3) DI DALAM CHAT === */
+        /* === HEADERS === */
         .bubble h1, .bubble h2, .bubble h3, .bubble h4 { 
             margin-top: 15px; margin-bottom: 8px; font-weight: 700; line-height: 1.3;
         }
@@ -168,33 +167,36 @@
         .bubble h3 { font-size: 1.15em; color: var(--orange-nusa); }
         .bubble h4 { font-size: 1.05em; color: var(--text-main); }
         
-        /* Penyesuaian warna header untuk Dark Mode */
-        [data-theme="dark"] .bubble h1, [data-theme="dark"] .bubble h2, [data-theme="dark"] .bubble h3 {
-            color: var(--orange-nusa);
-        }
+        [data-theme="dark"] .bubble h1, [data-theme="dark"] .bubble h2, [data-theme="dark"] .bubble h3 { color: var(--orange-nusa); }
         [data-theme="dark"] .bubble h4 { color: var(--text-main); }
         
         strong { color: #0284C7; font-weight: 700; transition: color 0.4s ease; }
         [data-theme="dark"] strong { color: var(--teal-smart); }
-        /* ========================================================== */
 
-        /* === CSS UNTUK ANIMASI TYPING (LOADING) === */
+        /* === PERBAIKAN TYPING INDICATOR === */
         .typing-indicator {
-            display: flex; align-items: center; gap: 5px; padding: 15px 20px !important;
+            display: flex !important; 
+            align-items: center; 
+            gap: 6px; 
+            padding: 15px 22px !important;
+            min-height: 24px; /* Memaksa bubble agar tidak gepeng */
         }
         .typing-dot {
-            width: 7px; height: 7px; background-color: var(--teal-smart);
+            width: 8px; 
+            height: 8px; 
+            background-color: var(--teal-smart);
             border-radius: 50%;
             animation: bounce 1.4s infinite ease-in-out both;
+            display: inline-block;
         }
         .typing-dot:nth-child(1) { animation-delay: -0.32s; }
         .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        .typing-dot:nth-child(3) { animation-delay: 0s; }
         
         @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+            0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
             40% { transform: scale(1); opacity: 1; }
         }
-        /* =========================================== */
 
         .input-area { padding: 20px 30px 30px; border-top: none; background: var(--header-bg); border-radius: 0 0 24px 24px; transition: background 0.4s ease; }
         
@@ -258,7 +260,6 @@
         const themeIcon = document.querySelector('#theme-toggle i');
         const themeBtn = document.getElementById('theme-toggle');
 
-        // Setup Tema
         updateThemeIcon(document.documentElement.getAttribute('data-theme'));
 
         function toggleTheme() {
@@ -307,36 +308,33 @@
             micBtn.innerHTML = '<i class="fas fa-microphone"></i>';
         }
 
-        // FUNGSI FORMATTER TEKS (Diperbarui untuk Headers)
         function formatText(text) {
             if (!text) return "";
             let formatted = text;
             
-            // 1. Mengubah format Headers Markdown (####, ###, ##, #)
             formatted = formatted.replace(/^#### (.*$)/gim, '<h4>$1</h4>');
             formatted = formatted.replace(/^### (.*$)/gim, '<h3>$1</h3>');
             formatted = formatted.replace(/^## (.*$)/gim, '<h2>$1</h2>');
             formatted = formatted.replace(/^# (.*$)/gim, '<h1>$1</h1>');
             
-            // 2. Mengubah List, Bold, dan Italic
             formatted = formatted.replace(/^[\*\-]\s+/gm, '• ');
             formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
             
-            // 3. Mengubah baris baru menjadi HTML <br>
             formatted = formatted.replace(/\n/g, '<br>');
-            
-            // 4. Mencegah spasi kosong ganda di bawah Header
             formatted = formatted.replace(/<\/h[1-4]><br>/g, (match) => match.replace('<br>', ''));
             
             return formatted;
         }
 
-        // FUNGSI TAMPILKAN ANIMASI TYPING
+        // FUNGSI ANIMASI TYPING YANG DIPERKUAT
         function showTypingIndicator() {
+            // Cegah duplikasi jika user klik berkali-kali
+            if (document.getElementById('typing-indicator-bubble')) return;
+
             const div = document.createElement('div'); 
             div.className = `message bot-message`;
-            div.id = 'typing-indicator-bubble'; // ID unik agar mudah dihapus
+            div.id = 'typing-indicator-bubble'; 
             div.innerHTML = `
                 <div class="avatar bot-avatar"><i class="fas fa-robot"></i></div>
                 <div class="bubble bot-bubble typing-indicator">
@@ -348,13 +346,11 @@
             chatWindow.scrollTop = chatWindow.scrollHeight;
         }
 
-        // FUNGSI HAPUS ANIMASI TYPING
         function removeTypingIndicator() {
             const indicator = document.getElementById('typing-indicator-bubble');
             if (indicator) indicator.remove();
         }
 
-        // FUNGSI MENGIRIM PESAN (Diperbarui)
         async function sendMessage() {
             const input = document.getElementById('user-input');
             const message = input.value.trim();
@@ -362,11 +358,10 @@
             
             if (welcomeScreen) welcomeScreen.style.display = 'none';
             
-            // 1. Tampilkan pesan User
             appendMessage('user', message);
             input.value = '';
 
-            // 2. Munculkan animasi mengetik dari Bot
+            // Tampilkan titik mengetik (typing indicator)
             showTypingIndicator();
 
             try {
@@ -377,7 +372,7 @@
                 });
                 const data = await res.json();
                 
-                // 3. Hapus animasi mengetik dan tampilkan jawaban asli
+                // Hapus titik mengetik setelah respon API datang
                 removeTypingIndicator();
                 appendMessage('bot', data.reply || "Maaf, terjadi gangguan teknis.");
             } catch (e) { 
