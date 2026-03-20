@@ -210,17 +210,20 @@
         textarea { 
             flex: 1; background: transparent; border: none; color: var(--text-main); outline: none; 
             padding: 8px 0; font-size: 15px; font-weight: 500; font-family: inherit; line-height: 1.5;
-            transition: color 0.4s ease; resize: none; overflow-y: auto; max-height: 150px;
+            transition: color 0.4s ease; resize: none; 
+            overflow-y: hidden; /* Sembunyikan scrollbar awal agar bersih */
+            max-height: 150px;
         }
+        /* Penanganan text panjang agar tidak nyangkut */
+        textarea::placeholder { color: var(--text-muted); font-weight: 400; transition: color 0.4s ease; }
         textarea::-webkit-scrollbar { width: 5px; }
         textarea::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-        textarea::placeholder { color: var(--text-muted); font-weight: 400; transition: color 0.4s ease; }
         
         .icon-btn { 
             width: 40px; height: 40px; border-radius: 50%; border: none; background: transparent; 
             color: var(--text-muted); cursor: pointer; transition: 0.3s; 
             display: flex; justify-content: center; align-items: center; font-size: 16px; 
-            margin-bottom: 2px; 
+            margin-bottom: 2px; flex-shrink: 0;
         }
         .icon-btn:hover { color: var(--teal-smart); background: var(--icon-hover-bg); }
         .send-btn { background: var(--teal-smart); color: white; margin-left: 10px; }
@@ -228,6 +231,49 @@
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* =======================================================
+           PERBAIKAN RESPONSIVE (KHUSUS TAMPILAN MOBILE / HP)
+           ======================================================= */
+        @media screen and (max-width: 768px) {
+            .main-container {
+                width: 100%;
+                max-width: 100%;
+                height: 100vh; /* Full screen di HP */
+                border-radius: 0;
+                border: none;
+            }
+            header {
+                border-radius: 0;
+                padding: 15px 20px;
+            }
+            .input-area {
+                padding: 15px 20px 20px; /* Kurangi padding agar tidak sesak */
+                border-radius: 0;
+            }
+            #chat-window {
+                padding: 20px 15px;
+            }
+            .welcome-title {
+                font-size: 24px; /* Judul lebih proporsional */
+            }
+            .suggestion-grid {
+                grid-template-columns: 1fr; /* Jadi 1 kolom memanjang rapi ke bawah */
+                gap: 10px;
+            }
+            .message {
+                max-width: 90%; /* Bubble chat memanjang optimal di HP */
+            }
+            .input-wrapper {
+                padding: 8px 12px 8px 16px;
+            }
+            textarea {
+                font-size: 14px;
+            }
+            .icon-btn {
+                width: 36px; height: 36px; font-size: 15px; /* Sesuaikan ukuran tombol */
+            }
+        }
     </style>
 </head>
 <body>
@@ -262,7 +308,7 @@
 
         <div class="input-area">
             <div class="input-wrapper">
-                <textarea id="user-input" rows="1" placeholder="Tanyakan rute atau destinasi wisata... (Shift+Enter untuk baris baru)"></textarea>
+                <textarea id="user-input" rows="1" placeholder="Ketik rute atau destinasi wisata..."></textarea>
                 <button id="mic-btn" class="icon-btn" title="Gunakan Suara" onclick="startDictation()"><i class="fas fa-microphone"></i></button>
                 <button class="icon-btn send-btn" title="Kirim Pesan" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
             </div>
@@ -277,16 +323,36 @@
         const themeIcon = document.querySelector('#theme-toggle i');
         const themeBtn = document.getElementById('theme-toggle');
 
+        // Logic Auto Resize & Scrollbar Cerdas
         userInput.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = (this.scrollHeight) + 'px';
-            if(this.value === '') this.style.height = 'auto'; 
+            
+            // Tampilkan scrollbar HANYA jika tinggi teks melebihi 150px
+            if (this.scrollHeight >= 150) {
+                this.style.overflowY = 'auto';
+            } else {
+                this.style.overflowY = 'hidden';
+            }
+            
+            if(this.value === '') {
+                this.style.height = 'auto';
+                this.style.overflowY = 'hidden';
+            }
         });
 
         userInput.addEventListener('keydown', function(e) {
+            // Di HP, Shift+Enter jarang dipakai, tapi di Desktop tetap berfungsi
             if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault(); 
-                sendMessage();
+                // Jangan cegah Enter jika di HP agar fitur enter bawaan keyboard HP berfungsi alami
+                // Namun untuk mencegah pengiriman kosong:
+                if(window.innerWidth > 768) {
+                    e.preventDefault(); 
+                    sendMessage();
+                } else if(this.value.trim() !== '') {
+                    // Untuk HP, enter biasanya membuat baris baru, kita biarkan saja.
+                    // User HP akan menggunakan tombol panah kirim (send-btn) biru.
+                }
             }
         });
 
@@ -379,7 +445,6 @@
             if (indicator) indicator.remove();
         }
 
-        /* === FUNGSI TYPEWRITER (DIPERCEPAT 4X LIPAT) === */
         function typeWriterHTML(element, htmlString, speed = 2) {
             let i = 0;
             let text = "";
@@ -387,7 +452,6 @@
             
             function type() {
                 if (i < htmlString.length) {
-                    // Proses 4 karakter sekaligus untuk mempercepat drastis tapi tetap ada efek mengalir
                     let charsToProcess = 4;
                     while (charsToProcess > 0 && i < htmlString.length) {
                         let char = htmlString.charAt(i);
@@ -424,6 +488,7 @@
             
             userInput.value = '';
             userInput.style.height = 'auto';
+            userInput.style.overflowY = 'hidden';
 
             showTypingIndicator();
 
@@ -465,7 +530,7 @@
                 chatWindow.appendChild(div);
                 
                 if (animate) {
-                    typeWriterHTML(bubble, formattedText, 2); // Kecepatan 2ms dengan proses 4 karakter/frame
+                    typeWriterHTML(bubble, formattedText, 2); 
                 } else {
                     bubble.innerHTML = formattedText;
                     chatWindow.scrollTop = chatWindow.scrollHeight;
