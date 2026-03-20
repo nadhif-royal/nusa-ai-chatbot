@@ -317,8 +317,6 @@
                 if(window.innerWidth > 768) {
                     e.preventDefault(); 
                     sendMessage();
-                } else if(this.value.trim() !== '') {
-                    // Mobile behaviour
                 }
             }
         });
@@ -343,27 +341,47 @@
             }
         }
 
+        /* === PERBAIKAN FITUR MICROPHONE === */
         function startDictation() {
-            if (window.hasOwnProperty('webkitSpeechRecognition')) {
-                const recognition = new webkitSpeechRecognition();
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (SpeechRecognition) {
+                const recognition = new SpeechRecognition();
                 recognition.continuous = false;
                 recognition.interimResults = false;
                 recognition.lang = "id-ID";
-                recognition.start();
 
-                micBtn.style.color = "var(--orange-nusa)"; 
-                micBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+                // Saat rekaman dimulai
+                recognition.onstart = function() {
+                    micBtn.style.color = "var(--orange-nusa)"; 
+                    micBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+                };
 
+                // Saat mendapat hasil suara
                 recognition.onresult = function(e) {
                     userInput.value = e.results[0][0].transcript;
                     userInput.dispatchEvent(new Event('input')); 
-                    recognition.stop();
-                    resetMicBtn();
-                    sendMessage();
+                    sendMessage(); // Otomatis mengirim pesan
                 };
-                recognition.onerror = () => { recognition.stop(); resetMicBtn(); };
+
+                // JIKA TERJADI ERROR / DIBLOKIR BROWSER
+                recognition.onerror = function(e) {
+                    console.error("Microphone error:", e.error);
+                    if (e.error === 'not-allowed') {
+                        alert("Akses mikrofon ditolak! Mohon izinkan mikrofon di pengaturan browser Anda (ikon gembok di sebelah URL).");
+                    } else if (e.error !== 'no-speech') {
+                        alert("Terjadi kesalahan mikrofon: " + e.error);
+                    }
+                };
+
+                // SANGAT PENTING: Saat rekaman selesai/berhenti (agar ikon tidak muter terus)
+                recognition.onend = function() {
+                    resetMicBtn();
+                };
+
+                recognition.start();
             } else { 
-                alert("Browser tidak mendukung fitur suara."); 
+                alert("Browser Anda tidak mendukung fitur suara. Gunakan Google Chrome."); 
             }
         }
 
@@ -412,7 +430,6 @@
             if (indicator) indicator.remove();
         }
 
-        /* === FUNGSI TYPEWRITER DENGAN TAB VISIBILITY API === */
         function typeWriterHTML(element, htmlString, speed = 2) {
             let i = 0;
             let text = "";
@@ -420,11 +437,7 @@
             
             function type() {
                 if (i < htmlString.length) {
-                    
-                    // ANTI-PAUSE: Jika user pindah tab, langsung render 500 karakter sekaligus
-                    // Jika tab sedang dibuka (aktif), render 4 karakter seperti biasa agar mulus
                     let charsToProcess = document.hidden ? 500 : 4;
-
                     while (charsToProcess > 0 && i < htmlString.length) {
                         let char = htmlString.charAt(i);
                         
