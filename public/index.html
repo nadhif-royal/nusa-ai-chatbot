@@ -211,10 +211,9 @@
             flex: 1; background: transparent; border: none; color: var(--text-main); outline: none; 
             padding: 8px 0; font-size: 15px; font-weight: 500; font-family: inherit; line-height: 1.5;
             transition: color 0.4s ease; resize: none; 
-            overflow-y: hidden; /* Sembunyikan scrollbar awal agar bersih */
+            overflow-y: hidden; 
             max-height: 150px;
         }
-        /* Penanganan text panjang agar tidak nyangkut */
         textarea::placeholder { color: var(--text-muted); font-weight: 400; transition: color 0.4s ease; }
         textarea::-webkit-scrollbar { width: 5px; }
         textarea::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
@@ -239,7 +238,7 @@
             .main-container {
                 width: 100%;
                 max-width: 100%;
-                height: 100vh; /* Full screen di HP */
+                height: 100vh;
                 border-radius: 0;
                 border: none;
             }
@@ -248,21 +247,21 @@
                 padding: 15px 20px;
             }
             .input-area {
-                padding: 15px 20px 20px; /* Kurangi padding agar tidak sesak */
+                padding: 15px 20px 20px; 
                 border-radius: 0;
             }
             #chat-window {
                 padding: 20px 15px;
             }
             .welcome-title {
-                font-size: 24px; /* Judul lebih proporsional */
+                font-size: 24px; 
             }
             .suggestion-grid {
-                grid-template-columns: 1fr; /* Jadi 1 kolom memanjang rapi ke bawah */
+                grid-template-columns: 1fr; 
                 gap: 10px;
             }
             .message {
-                max-width: 90%; /* Bubble chat memanjang optimal di HP */
+                max-width: 90%; 
             }
             .input-wrapper {
                 padding: 8px 12px 8px 16px;
@@ -271,7 +270,7 @@
                 font-size: 14px;
             }
             .icon-btn {
-                width: 36px; height: 36px; font-size: 15px; /* Sesuaikan ukuran tombol */
+                width: 36px; height: 36px; font-size: 15px; 
             }
         }
     </style>
@@ -308,7 +307,7 @@
 
         <div class="input-area">
             <div class="input-wrapper">
-                <textarea id="user-input" rows="1" placeholder="Ketik rute atau destinasi wisata..."></textarea>
+                <textarea id="user-input" rows="1" placeholder="Tanya destinasi atau buat itinerary..."></textarea>
                 <button id="mic-btn" class="icon-btn" title="Gunakan Suara" onclick="startDictation()"><i class="fas fa-microphone"></i></button>
                 <button class="icon-btn send-btn" title="Kirim Pesan" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
             </div>
@@ -323,12 +322,10 @@
         const themeIcon = document.querySelector('#theme-toggle i');
         const themeBtn = document.getElementById('theme-toggle');
 
-        // Logic Auto Resize & Scrollbar Cerdas
         userInput.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = (this.scrollHeight) + 'px';
             
-            // Tampilkan scrollbar HANYA jika tinggi teks melebihi 150px
             if (this.scrollHeight >= 150) {
                 this.style.overflowY = 'auto';
             } else {
@@ -342,16 +339,12 @@
         });
 
         userInput.addEventListener('keydown', function(e) {
-            // Di HP, Shift+Enter jarang dipakai, tapi di Desktop tetap berfungsi
             if (e.key === 'Enter' && !e.shiftKey) {
-                // Jangan cegah Enter jika di HP agar fitur enter bawaan keyboard HP berfungsi alami
-                // Namun untuk mencegah pengiriman kosong:
                 if(window.innerWidth > 768) {
                     e.preventDefault(); 
                     sendMessage();
                 } else if(this.value.trim() !== '') {
-                    // Untuk HP, enter biasanya membuat baris baru, kita biarkan saja.
-                    // User HP akan menggunakan tombol panah kirim (send-btn) biru.
+                    // Mobile behaviour
                 }
             }
         });
