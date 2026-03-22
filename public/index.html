@@ -71,7 +71,7 @@
         
         body { 
             background-color: var(--bg-color); 
-            height: 100vh; height: 100dvh; /* FIX: Dynamic Viewport Height */
+            height: 100vh; height: 100dvh;
             display: flex; justify-content: center; align-items: center; 
             color: var(--text-main); overflow: hidden; position: relative; 
             transition: background-color 0.4s ease, color 0.4s ease;
@@ -88,7 +88,7 @@
 
         .main-container { 
             width: 95%; max-width: 900px; 
-            height: 90vh; height: 90dvh; /* FIX: Agar proporsional di semua layar */
+            height: 90vh; height: 90dvh; 
             background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border); border-radius: 24px; display: flex; flex-direction: column; 
             box-shadow: 0 20px 50px -10px rgba(0,0,0,0.3); 
@@ -198,6 +198,17 @@
             40% { transform: scale(1); opacity: 1; }
         }
 
+        /* === ANIMASI MIKROFON MEREKAM (PULSING RED) === */
+        @keyframes pulse-record {
+            0% { transform: scale(1); color: #ef4444; }
+            50% { transform: scale(1.2); color: #f87171; }
+            100% { transform: scale(1); color: #ef4444; }
+        }
+        .recording-active {
+            animation: pulse-record 1.5s infinite;
+            color: #ef4444 !important; /* Warna merah rekaman asli */
+        }
+
         .input-area { padding: 20px 30px 30px; border-top: none; background: var(--header-bg); border-radius: 0 0 24px 24px; transition: background 0.4s ease; }
         
         .input-wrapper { 
@@ -237,7 +248,7 @@
         @media screen and (max-width: 768px) {
             .main-container {
                 width: 100%; max-width: 100%; 
-                height: 100vh; height: 100dvh; /* FIX: Bebas terpotong di HP */
+                height: 100vh; height: 100dvh;
                 border-radius: 0; border: none;
             }
             header { border-radius: 0; padding: 15px 20px; }
@@ -299,6 +310,9 @@
         const themeIcon = document.querySelector('#theme-toggle i');
         const themeBtn = document.getElementById('theme-toggle');
 
+        let recognition;
+        let isRecording = false;
+
         userInput.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = (this.scrollHeight) + 'px';
@@ -344,43 +358,64 @@
             }
         }
 
+        /* === FITUR MICROPHONE CANGGIH (REAL-TIME) === */
         function startDictation() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             
-            if (SpeechRecognition) {
-                const recognition = new SpeechRecognition();
-                recognition.continuous = false;
-                recognition.interimResults = false;
-                recognition.lang = "id-ID";
-
-                recognition.onstart = function() {
-                    micBtn.style.color = "var(--orange-nusa)"; 
-                    micBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
-                };
-
-                recognition.onresult = function(e) {
-                    userInput.value = e.results[0][0].transcript;
-                    userInput.dispatchEvent(new Event('input')); 
-                    sendMessage(); 
-                };
-
-                recognition.onerror = function(e) {
-                    console.error("Microphone error:", e.error);
-                    if (e.error === 'not-allowed') {
-                        alert("Akses mikrofon ditolak! Mohon izinkan mikrofon di pengaturan browser Anda (ikon gembok di sebelah URL).");
-                    } else if (e.error !== 'no-speech') {
-                        alert("Terjadi kesalahan mikrofon: " + e.error);
-                    }
-                };
-
-                recognition.onend = function() {
-                    resetMicBtn();
-                };
-
-                recognition.start();
-            } else { 
+            if (!SpeechRecognition) {
                 alert("Browser Anda tidak mendukung fitur suara. Gunakan Google Chrome."); 
+                return;
             }
+
+            // Jika sedang merekam dan dipencet lagi, matikan rekamannya
+            if (isRecording && recognition) {
+                recognition.stop();
+                return;
+            }
+
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = true; // KUNCI FITUR REAL-TIME
+            recognition.lang = "id-ID";
+
+            recognition.onstart = function() {
+                isRecording = true;
+                micBtn.classList.add('recording-active');
+                micBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                userInput.value = ''; // Mengosongkan kolom teks agar bersih
+                userInput.placeholder = "Mendengarkan... (Klik lagi untuk kirim)";
+            };
+
+            recognition.onresult = function(e) {
+                let transcript = '';
+                // Looping untuk merangkai kata demi kata secara live
+                for (let i = e.resultIndex; i < e.results.length; ++i) {
+                    transcript += e.results[i][0].transcript;
+                }
+                userInput.value = transcript;
+                userInput.dispatchEvent(new Event('input')); // Memaksa textarea membesar otomatis
+            };
+
+            recognition.onerror = function(e) {
+                console.error("Microphone error:", e.error);
+                if (e.error === 'not-allowed') {
+                    alert("Akses mikrofon ditolak! Mohon izinkan mikrofon di pengaturan browser Anda.");
+                }
+            };
+
+            recognition.onend = function() {
+                isRecording = false;
+                micBtn.classList.remove('recording-active');
+                userInput.placeholder = "Tanya destinasi atau buat itinerary...";
+                resetMicBtn();
+
+                // Begitu suara berhenti, langsung otomatis terkirim!
+                if (userInput.value.trim() !== '') {
+                    sendMessage();
+                }
+            };
+
+            recognition.start();
         }
 
         function resetMicBtn() {
