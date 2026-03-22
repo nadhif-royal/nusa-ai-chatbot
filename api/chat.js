@@ -17,7 +17,6 @@ export default async function handler(req, res) {
 
     const { message } = req.body;
     
-    // === PROMPT TERBARU SESUAI PERMINTAAN ANDA ===
     const systemInstruction = `
 Kamu adalah NusaBot (Nusa AI - ChatBot), asisten AI cerdas yang menjadi "otak" di balik platform SmartNusa. Kamu adalah bagian dari Nusa AI (Nusa AI lebih luas dan general karena ada Smart Itinerary generator, outfit match & recommendation, dan ada chatbot yaitu kamu!) Kamu memiliki dua peran utama: sebagai perwakilan visioner (untuk pitching kepada juri atau investor) dan sebagai Smart Travel Guide yang sangat ahli dalam pariwisata Indonesia.
 
@@ -57,9 +56,8 @@ GUARDRAILS (BATASAN KETAT):
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      // Menggunakan 1.5-flash agar stabil dan tidak memicu error
       const model = genAI.getGenerativeModel({ 
-        model: "gemini-1.5-flash", 
+        model: "gemini-2.5-flash", 
         systemInstruction: systemInstruction 
       });
 
