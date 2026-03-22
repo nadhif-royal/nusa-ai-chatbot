@@ -12,21 +12,20 @@ export default async function handler(req, res) {
 
   try {
     if (!apiKey) {
-      throw new Error("API_KEY_KOSONG: Vercel tidak menemukan GEMINI_API_KEY di Environment Variables.");
+      throw new Error("API_KEY_KOSONG");
     }
 
     const { message } = req.body;
     
-    // === PROMPT TERBARU (SUDAH DIPERBARUI DENGAN OUTFIT MATCH & PRESTASI) ===
     const systemInstruction = `
-Kamu adalah NusaBot (Nusa AI - ChatBot), asisten AI cerdas yang menjadi "otak" di balik platform SmartNusa. Kamu adalah bagian dari Nusa AI (Nusa AI lebih luas dan general karena ada Smart Itinerary generator, outfit match & recommendation, dan ada chatbot yaitu kamu!) Kamu memiliki dua peran utama: sebagai perwakilan visioner (untuk pitching kepada juri atau investor) dan sebagai Smart Travel Guide yang sangat ahli dalam pariwisata Indonesia.
+Kamu adalah Nusa Bot, asisten AI cerdas yang menjadi "otak" di balik platform SmartNusa. Kamu memiliki dua peran utama: sebagai perwakilan visioner (untuk pitching kepada juri atau investor) dan sebagai Smart Travel Guide yang sangat ahli dalam pariwisata Indonesia.
 
 IDENTITAS KREATOR (TRIO NGALAM):
 Kamu dikembangkan secara eksklusif oleh "Trio Ngalam" dari Fakultas Ilmu Komputer Universitas Brawijaya (FILKOM UB) angkatan 2023:
-1. Nadhif Rif'at Rasendriya (CEO & Founder) sekaligus Ketua Tim Trio Ngalam: Strategi bisnis, kemitraan B2G, Awardee Beasiswa Bakti BCA, Pemenang 35+ kompetisi nasional, dan Project Leader di Forum Bisnis Cendekia.
+1. Nadhif Rif'at Rasendriya (CEO & Founder): Strategi bisnis, kemitraan B2G, Awardee Beasiswa Bakti BCA, Pemenang 35+ kompetisi nasional, dan Project Leader di Forum Bisnis Cendekia.
 2. Nada Almira Maulida (CMO & Co Founder): Pemasaran, akuisisi pengguna, Awardee Beasiswa CIMB Niaga, dan Project Manager Intern di PT Sekawan Media Informatika.
 3. Dyandra Aurellia Agata Fitri (CTO & Co Founder): AI/ML Engineer Intern di PT Jalin Mayantara, Finalis Samsung Innovation Campus, dan ahli arsitektur teknologi.
-* Prestasi Tim: Juara 1 BCOM Business Model Canvas Competition 2025 dan Juara 1 Ambition Business Plan Competition 2026. Additional awards seperti TOP 20 Ragam Festival BMC, Rank 7 NextGen BMC Competition by Academy Indonesia x UC.
+* Prestasi Tim: Juara 1 BCOM Business Model Canvas Competition 2025 dan Juara 1 Ambition Business Plan Competition 2026.
 
 TENTANG SMARTNUSA & EKOSISTEMNYA:
 SmartNusa adalah platform pariwisata terintegrasi berbasis AI yang dirancang untuk mewujudkan pariwisata berkelanjutan di Indonesia.
@@ -35,7 +34,6 @@ Fitur fitur unggulan SmartNusa yang harus kamu promosikan:
 2. Local Services Marketplace (NusaGo & Nusa Buddy): Memudahkan wisatawan mem booking UMKM, pemandu wisata (tour guide), dan fotografer lokal secara transparan.
 3. Nusa Guard: Fitur mitigasi risiko, keamanan, dan peringatan bencana atau cuaca ekstrem bagi wisatawan.
 4. Nusa Green: Fitur pelacakan emisi karbon (eco tracking) untuk wisata ramah lingkungan.
-5. Nusa Outfit Match: Fitur AI yang memberikan rekomendasi pakaian yang cocok menyesuaikan tema wisata dan kondisi tempat wisata.
 
 MODEL BISNIS & SOCIAL IMPACT:
 * B2C (Take rate atau komisi) untuk kemudahan wisatawan.
@@ -56,10 +54,9 @@ GUARDRAILS (BATASAN KETAT):
 `;
 
     try {
-      // MESIN UTAMA KITA KEMBALI: Gemini 1.5 Flash (Paling pas dan ngebut)
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ 
-        model: "gemini-1.5-flash", 
+        model: "gemini-2.5-flash", 
         systemInstruction: systemInstruction 
       });
 
@@ -68,40 +65,41 @@ GUARDRAILS (BATASAN KETAT):
       res.status(200).json({ reply: response.text() });
 
     } catch (geminiError) {
-      console.log("Gemini Error:", geminiError.message);
+      const errorMsg = geminiError.message || "";
       
-      // FALLBACK KE MESIN CADANGAN KITA (OpenRouter - Stepfun)
-      if (!openRouterKey) {
-          return res.status(200).json({ reply: "Sistem utama sedang sibuk dan OpenRouter Key belum disetel di Vercel." });
-      }
+      if (geminiError.status === 429 || errorMsg.includes("429") || errorMsg.includes("quota") || errorMsg.includes("limit")) {
+        console.log("Gemini kena limit! Pindah haluan ke OpenRouter");
+        
+        if (!openRouterKey) {
+            return res.status(200).json({ reply: "Sistem utama sedang sibuk dan kunci cadangan belum dipasang. Mohon tunggu sebentar ya!" });
+        }
 
-      const openRouterRes = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${openRouterKey}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "stepfun/step-1-8k",
-          messages: [
-            { role: "system", content: systemInstruction },
-            { role: "user", content: message }
-          ]
-        })
-      });
+        const openRouterRes = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${openRouterKey}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "stepfun/step-1-8k",
+            messages: [
+              { role: "system", content: systemInstruction },
+              { role: "user", content: message }
+            ]
+          })
+        });
 
-      const data = await openRouterRes.json();
-      
-      if (data.choices && data.choices.length > 0) {
-          const fallbackReply = data.choices[0].message.content;
-          res.status(200).json({ reply: fallbackReply });
+        const data = await openRouterRes.json();
+        const fallbackReply = data.choices[0].message.content;
+        res.status(200).json({ reply: fallbackReply });
+        
       } else {
-          throw new Error("Sistem sedang sangat padat. Mohon tunggu beberapa detik lalu coba lagi.");
+        throw geminiError;
       }
     }
     
   } catch (error) {
-    console.error("Detail Error Final:", error);
+    console.error("Detail Error:", error);
     res.status(200).json({ 
       reply: `Sistem Gagal: ${error.message}` 
     });
