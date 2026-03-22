@@ -1,8 +1,10 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const apiKey = process.env.GEMINI_API_KEY;
+const openRouterKey = process.env.OPENROUTER_API_KEY;
 
 export default async function handler(req, res) {
+  // Setup CORS agar bisa diakses dari frontend
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -14,12 +16,10 @@ export default async function handler(req, res) {
       throw new Error("API_KEY_KOSONG: Vercel tidak menemukan GEMINI_API_KEY di Environment Variables.");
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
     const { message } = req.body;
     
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash", 
-      systemInstruction: `
+    // === SYSTEM INSTRUCTION TERBARU (UPDATE PRESTASI & OUTFIT MATCH) ===
+    const systemInstruction = `
 Kamu adalah NusaBot (Nusa AI - ChatBot), asisten AI cerdas yang menjadi "otak" di balik platform SmartNusa. Kamu adalah bagian dari Nusa AI (Nusa AI lebih luas dan general karena ada Smart Itinerary generator, outfit match & recommendation, dan ada chatbot yaitu kamu!) Kamu memiliki dua peran utama: sebagai perwakilan visioner (untuk pitching kepada juri atau investor) dan sebagai Smart Travel Guide yang sangat ahli dalam pariwisata Indonesia.
 
 IDENTITAS KREATOR (TRIO NGALAM):
@@ -54,17 +54,67 @@ GUARDRAILS (BATASAN KETAT):
 * SANGAT PENTING: Dilarang keras menyebutkan nama atau brand "NusaPath". Kamu hanya boleh menggunakan nama "Nusa AI" (sebagai teknologinya) dan "SmartNusa" (sebagai platform aplikasinya).
 * Gunakan pemformatan teks Markdown yang rapi (gunakan bullet points, enter, dan **teks tebal** untuk poin penting). 
 * Bahasa: Ramah, profesional, elegan, dan sangat bangga akan kekayaan Nusantara.
-`
-    });
+`;
 
-    const result = await model.generateContent(message);
-    const response = await result.response;
+    try {
+      // MESIN UTAMA: Google Gemini API
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-1.5-flash", 
+        systemInstruction: systemInstruction 
+      });
+
+      const result = await model.generateContent(message);
+      const response = await result.response;
+      res.status(200).json({ reply: response.text() });
+
+    } catch (geminiError) {
+      const errorMsg = geminiError.message || "";
+      
+      // SISTEM FALLBACK: Jika Gemini Error 429 (Limit), 404 (Not Found), atau Quota habis
+      if (geminiError.status === 429 || errorMsg.includes("429") || errorMsg.includes("quota") || errorMsg.includes("limit") || errorMsg.includes("404")) {
+        console.log("Sistem Utama Sibuk/Error! Mengalihkan ke Jalur Cadangan (OpenRouter)...");
+        
+        if (!openRouterKey) {
+            return res.status(200).json({ reply: "Sistem utama sedang sibuk dan kunci cadangan belum dipasang. Mohon tunggu sebentar ya!" });
+        }
+
+        // MESIN CADANGAN: OpenRouter API
+        const openRouterRes = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${openRouterKey}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "stepfun/step-1-8k",
+            messages: [
+              { role: "system", content: systemInstruction },
+              { role: "user", content: message }
+            ]
+          })
+        });
+
+        const data = await openRouterRes.json();
+        
+        // Memastikan ada balasan dari OpenRouter
+        if (data.choices && data.choices.length > 0) {
+            const fallbackReply = data.choices[0].message.content;
+            res.status(200).json({ reply: fallbackReply });
+        } else {
+            throw new Error("Respon dari server cadangan kosong.");
+        }
+        
+      } else {
+        // Jika error lain yang tidak terduga
+        throw geminiError;
+      }
+    }
     
-    res.status(200).json({ reply: response.text() });
   } catch (error) {
-    console.error("Detail Error:", error);
+    console.error("Detail Error Final:", error);
     res.status(200).json({ 
-      reply: `Sistem Gagal: ${error.message}` 
+      reply: `Sistem Gagal: ${error.message}. Coba refresh halaman atau periksa API Key Anda.` 
     });
   }
 }
