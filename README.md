@@ -1,6 +1,6 @@
 # 🏝️ Nusa Bot (Nusa AI Chatbot) - Smart Travel Assistant
 
-**Nusa AI - Chatbot atau Nusa Bot** adalah asisten perjalanan cerdas berbasis *Artificial Intelligence* yang dirancang untuk membantu wisatawan mengeksplorasi keindahan autentik Indonesia. Proyek ini merupakan bagian dari ekosistem **NusaPath & SmartNusa** ("Your Journey to Authentic Indonesia") dan dikembangkan oleh tim **Trio Ngalam**.
+**Nusa AI - Chatbot (atau Nusa Bot)** adalah asisten perjalanan cerdas berbasis *Artificial Intelligence* yang dirancang untuk membantu wisatawan mengeksplorasi keindahan autentik Indonesia. Proyek ini merupakan bagian dari ekosistem **NusaPath & SmartNusa** ("Your Journey to Authentic Indonesia") dan dikembangkan oleh tim **Trio Ngalam**.
 
 ## 🌟 Fitur Utama
 
