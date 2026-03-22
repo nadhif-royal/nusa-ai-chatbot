@@ -17,6 +17,7 @@ export default async function handler(req, res) {
 
     const { message } = req.body;
     
+    // === PROMPT TERBARU (SUDAH DIPERBARUI DENGAN OUTFIT MATCH & PRESTASI) ===
     const systemInstruction = `
 Kamu adalah NusaBot (Nusa AI - ChatBot), asisten AI cerdas yang menjadi "otak" di balik platform SmartNusa. Kamu adalah bagian dari Nusa AI (Nusa AI lebih luas dan general karena ada Smart Itinerary generator, outfit match & recommendation, dan ada chatbot yaitu kamu!) Kamu memiliki dua peran utama: sebagai perwakilan visioner (untuk pitching kepada juri atau investor) dan sebagai Smart Travel Guide yang sangat ahli dalam pariwisata Indonesia.
 
@@ -54,26 +55,26 @@ GUARDRAILS (BATASAN KETAT):
 * Bahasa: Ramah, profesional, elegan, dan sangat bangga akan kekayaan Nusantara.
 `;
 
-    // TRIK INJEKSI: Menggabungkan instruksi langsung ke prompt agar kebal error 404 di SDK lama
-    const combinedPrompt = systemInstruction + "\n\n---\n\nPERTANYAAN USER:\n" + message;
-
     try {
+      // MESIN UTAMA KITA KEMBALI: Gemini 1.5 Flash (Paling pas dan ngebut)
       const genAI = new GoogleGenerativeAI(apiKey);
-      // Menggunakan gemini-pro yang sangat stabil
-      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-1.5-flash", 
+        systemInstruction: systemInstruction 
+      });
 
-      const result = await model.generateContent(combinedPrompt);
+      const result = await model.generateContent(message);
       const response = await result.response;
       res.status(200).json({ reply: response.text() });
 
     } catch (geminiError) {
       console.log("Gemini Error:", geminiError.message);
       
+      // FALLBACK KE MESIN CADANGAN KITA (OpenRouter - Stepfun)
       if (!openRouterKey) {
           return res.status(200).json({ reply: "Sistem utama sedang sibuk dan OpenRouter Key belum disetel di Vercel." });
       }
 
-      // JALUR CADANGAN: Ganti ke model Llama 3 yang lebih stabil
       const openRouterRes = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -81,7 +82,7 @@ GUARDRAILS (BATASAN KETAT):
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model: "meta-llama/llama-3-8b-instruct:free", 
+          model: "stepfun/step-1-8k",
           messages: [
             { role: "system", content: systemInstruction },
             { role: "user", content: message }
@@ -91,16 +92,11 @@ GUARDRAILS (BATASAN KETAT):
 
       const data = await openRouterRes.json();
       
-      // Menangkap error asli dari OpenRouter agar tidak sekadar bilang "kosong"
-      if (data.error) {
-          throw new Error(`OpenRouter Error: ${data.error.message}`);
-      }
-
       if (data.choices && data.choices.length > 0) {
           const fallbackReply = data.choices[0].message.content;
           res.status(200).json({ reply: fallbackReply });
       } else {
-          throw new Error("Respon dari OpenRouter tidak terbaca dengan benar.");
+          throw new Error("Sistem sedang sangat padat. Mohon tunggu beberapa detik lalu coba lagi.");
       }
     }
     
